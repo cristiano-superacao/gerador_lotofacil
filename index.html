@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LotoFácil Estratégica - Gere jogos inteligentes baseados em estatísticas</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js para gráficos futuros -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Estilos customizados -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    
+    <meta name="description" content="Ferramenta inteligente para gerar jogos da Lotofácil baseados em estatísticas e estratégias comprovadas.">
+    <meta name="keywords" content="lotofacil, estrategias, estatisticas, jogos, analises, numeros">
+    <meta name="author" content="LotoFácil Estratégica">
+    
+    <!-- PWA e SEO -->
+    <meta name="theme-color" content="#667eea">
+    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+    <link rel="apple-touch-icon" href="assets/images/icon-192.png">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Cabeçalho fixo -->
+    <header class="gradient-bg text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-white text-purple-600 rounded-full p-3">
+                        <i class="fas fa-dice text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">LotoFácil Estratégica</h1>
+                        <p class="text-purple-200 text-sm">Gere jogos inteligentes baseados em estatísticas</p>
+                    </div>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#inicio" class="hover:text-purple-200 transition-colors">Início</a>
+                    <a href="#analises" class="hover:text-purple-200 transition-colors">Análises</a>
+                    <a href="#sobre" class="hover:text-purple-200 transition-colors">Sobre</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo principal -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Seção último resultado -->
+        <section id="ultimo-resultado" class="mb-12">
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-trophy text-yellow-500 mr-3"></i>
+                        Último Resultado
+                    </h2>
+                    <button id="atualizarResultado" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-sync-alt mr-2"></i>
+                        Atualizar
+                    </button>
+                </div>
+                
+                <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                    <div class="grid md:grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-600 mb-2">Concurso</label>
+                            <input type="number" id="concurso" placeholder="Ex: 3000" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-600 mb-2">Data</label>
+                            <input type="date" id="dataConcurso" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <button id="salvarResultado" class="mt-6 w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
+                                <i class="fas fa-save mr-2"></i>
+                                Salvar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600 mb-2">Dezenas Sorteadas (15 números separados por vírgula)</label>
+                        <input type="text" id="dezenasUltimoResultado" placeholder="Ex: 01,02,03,04,05,06,07,08,09,10,11,12,13,14,15" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+                </div>
+                
+                <div id="ultimoResultadoDisplay" class="hidden">
+                    <div class="flex flex-wrap items-center justify-between mb-4">
+                        <div>
+                            <span class="text-sm text-gray-600">Concurso:</span>
+                            <span id="concursoDisplay" class="font-bold text-lg ml-2">-</span>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-600">Data:</span>
+                            <span id="dataDisplay" class="font-bold text-lg ml-2">-</span>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-lg font-semibold mb-3 text-gray-700">Dezenas Sorteadas</h3>
+                        <div id="dezenasDisplay" class="flex flex-wrap justify-center gap-2">
+                            <!-- As dezenas serão inseridas aqui via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção análises -->
+        <section id="analises" class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Estratégias Inteligentes</h2>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+                Escolha uma das nossas análises baseadas em padrões estatísticos da Lotofácil. Cada estratégia gera 7 jogos únicos e otimizados.
+            </p>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="cardsAnalises">
+                <!-- Os cards serão inseridos aqui via JavaScript -->
+            </div>
+        </section>
+
+        <!-- Seção resultados -->
+        <section id="resultados" class="mb-12 hidden">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Seus Jogos Gerados</h2>
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 id="estrategiaUsada" class="text-xl font-bold text-gray-800">-</h3>
+                        <p class="text-gray-600">7 jogos únicos gerados</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="copiarJogos" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-copy mr-2"></i>
+                            Copiar
+                        </button>
+                        <button id="exportarJogos" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-download mr-2"></i>
+                            Exportar
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="jogosGerados" class="grid md:grid-cols-2 gap-4">
+                    <!-- Os jogos serão inseridos aqui via JavaScript -->
+                </div>
+                
+                <div class="mt-6 text-center">
+                    <button id="gerarNovos" class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg transition-colors font-semibold">
+                        <i class="fas fa-redo mr-2"></i>
+                        Gerar Novos Jogos
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-6">
+                <div>
+                    <h3 class="text-lg font-bold mb-3">LotoFácil Estratégica</h3>
+                    <p class="text-gray-400 text-sm">
+                        Ferramenta de apoio para estudos e estratégias da Lotofácil baseada em análises estatísticas.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Links</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#sobre" class="hover:text-white transition-colors">Sobre</a></li>
+                        <li><a href="#contato" class="hover:text-white transition-colors">Contato</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">GitHub</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Aviso Legal</h4>
+                    <p class="text-gray-400 text-sm">
+                        Este site é apenas uma ferramenta estatística e não garante resultados financeiros. 
+                        Jogue com responsabilidade.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-6 pt-6 text-center text-gray-400 text-sm">
+                <p>&copy; 2024 LotoFácil Estratégica. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript principal -->
+    <script src="assets/js/app.js"></script>
+</body>
+</html>

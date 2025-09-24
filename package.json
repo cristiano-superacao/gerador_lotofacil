@@ -1,0 +1,59 @@
+{
+  "name": "lotofacil-estrategica",
+  "version": "1.0.0",
+  "description": "Uma ferramenta de apoio para estudos e estratégias da Lotofácil — simples, confiável e prática.",
+  "main": "index.html",
+  "scripts": {
+    "start": "node server.js 3000",
+    "dev": "node server.js 3000",
+    "serve": "python server.py 8000",
+    "build": "echo 'Build completed - projeto é estático'",
+    "test": "echo 'Testes serão implementados em versões futuras'",
+    "deploy:netlify": "netlify deploy --prod",
+    "deploy:vercel": "vercel --prod",
+    "validate": "echo 'Validando arquivos...' && node -c assets/js/app.js",
+    "clean": "echo 'Limpando arquivos temporários...'",
+    "zip": "powershell Compress-Archive -Path * -DestinationPath lotofacil-estrategica.zip -Force"
+  },
+  "keywords": [
+    "lotofacil",
+    "estrategias",
+    "estatisticas",
+    "jogos",
+    "analises",
+    "numeros",
+    "probabilidade",
+    "matematica"
+  ],
+  "author": {
+    "name": "LotoFácil Estratégica Team",
+    "email": "contato@lotofacilestrategica.com",
+    "url": "https://github.com/seu-usuario/lotofacil-estrategica"
+  },
+  "license": "MIT",
+  "homepage": "https://seu-usuario.github.io/lotofacil-estrategica/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seu-usuario/lotofacil-estrategica.git"
+  },
+  "bugs": {
+    "url": "https://github.com/seu-usuario/lotofacil-estrategica/issues"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "browserslist": [
+    "defaults",
+    "not IE 11",
+    "maintained node versions"
+  ],
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "live-server": "^1.2.2"
+  },
+  "optionalDependencies": {
+    "netlify-cli": "^17.0.0",
+    "vercel": "^32.0.0"
+  }
+}

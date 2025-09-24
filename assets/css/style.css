@@ -1,0 +1,329 @@
+/* LotoFácil Estratégica - Estilos Customizados */
+/* Autor: Sistema Inteligente de Análise Lotofácil */
+
+/* Gradientes personalizados */
+.gradient-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+}
+
+/* Efeitos de sombra e hover dos cards */
+.card-shadow {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-shadow:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Bolas dos números */
+.number-ball {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    margin: 3px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.number-ball::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: left 0.5s;
+}
+
+.number-ball:hover::before {
+    left: 100%;
+}
+
+.number-ball-result {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    border: 2px solid #ffffff;
+}
+
+.number-ball-game {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    border: 2px solid #ffffff;
+}
+
+.number-ball:hover {
+    transform: scale(1.1);
+}
+
+/* Animações de loading */
+.loading {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: .5;
+    }
+}
+
+/* Efeitos de entrada suaves */
+.fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+    opacity: 0;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-up {
+    animation: slideUp 0.4s ease-out forwards;
+    transform: translateY(20px);
+    opacity: 0;
+}
+
+@keyframes slideUp {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Botões personalizados */
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* Alertas personalizados */
+.alert {
+    backdrop-filter: blur(10px);
+    border-left: 4px solid currentColor;
+}
+
+.alert-success {
+    background: rgba(34, 197, 94, 0.1);
+    border-color: #22c55e;
+    color: #15803d;
+}
+
+.alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: #ef4444;
+    color: #dc2626;
+}
+
+.alert-warning {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: #f59e0b;
+    color: #d97706;
+}
+
+.alert-info {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: #3b82f6;
+    color: #2563eb;
+}
+
+/* Modal personalizado */
+.modal-backdrop {
+    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+    animation: modalScale 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalScale {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46a3 100%);
+}
+
+/* Responsividade melhorada */
+@media (max-width: 640px) {
+    .number-ball {
+        width: 36px;
+        height: 36px;
+        font-size: 12px;
+        margin: 2px;
+    }
+    
+    .card-shadow:hover {
+        transform: translateY(-4px) scale(1.01);
+    }
+}
+
+/* Estados de foco melhorados para acessibilidade */
+button:focus,
+input:focus,
+select:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* Modo escuro (preparação futura) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #0f172a;
+        --text-color: #f1f5f9;
+        --card-bg: #1e293b;
+    }
+}
+
+/* Animações de resultado */
+.result-appear {
+    animation: resultAppear 0.8s ease-out forwards;
+}
+
+@keyframes resultAppear {
+    0% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    50% {
+        opacity: 0.8;
+        transform: translateY(-5px) scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Efeito de typing para textos */
+.typing-effect {
+    overflow: hidden;
+    border-right: 2px solid #667eea;
+    white-space: nowrap;
+    margin: 0 auto;
+    animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent; }
+    50% { border-color: #667eea; }
+}
+
+/* Melhorias de performance */
+.card-shadow,
+.number-ball,
+.btn-primary {
+    will-change: transform;
+}
+
+/* Indicadores de carregamento */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Print styles */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    body {
+        font-size: 12pt;
+        line-height: 1.5;
+    }
+    
+    .number-ball {
+        border: 1px solid #000 !important;
+        background: white !important;
+        color: black !important;
+    }
+}
