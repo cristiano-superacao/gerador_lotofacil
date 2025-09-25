@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - LotoFácil Estratégica</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Estilos customizados -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    
+    <style>
+        .admin-sidebar {
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            width: 280px;
+            transition: all 0.3s ease;
+        }
+        
+        .admin-sidebar.collapsed {
+            width: 80px;
+        }
+        
+        .sidebar-item {
+            transition: all 0.3s ease;
+            border-radius: 10px;
+            margin: 4px 8px;
+        }
+        
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .sidebar-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid white;
+        }
+        
+        .content-area {
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px rgba(102, 126, 234, 0.15);
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .btn-admin {
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+        
+        .btn-admin:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div id="sidebar" class="admin-sidebar text-white flex flex-col">
+            <!-- Header -->
+            <div class="p-6 border-b border-white border-opacity-20">
+                <div class="flex items-center justify-between">
+                    <div id="logoArea" class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-dice text-white"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold">Admin Panel</h2>
+                            <p class="text-xs text-white text-opacity-70">LotoFácil Estratégica</p>
+                        </div>
+                    </div>
+                    <button id="toggleSidebar" class="p-2 rounded-lg hover:bg-white hover:bg-opacity-20">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Menu Items -->
+            <nav class="flex-1 p-4 space-y-2">
+                <button class="sidebar-item w-full text-left p-3 flex items-center space-x-3 active" data-section="dashboard">
+                    <i class="fas fa-chart-dashboard w-5"></i>
+                    <span class="sidebar-text">Dashboard</span>
+                </button>
+                
+                <button class="sidebar-item w-full text-left p-3 flex items-center space-x-3" data-section="usuarios">
+                    <i class="fas fa-users w-5"></i>
+                    <span class="sidebar-text">Usuários</span>
+                </button>
+                
+                <button class="sidebar-item w-full text-left p-3 flex items-center space-x-3" data-section="assinaturas">
+                    <i class="fas fa-credit-card w-5"></i>
+                    <span class="sidebar-text">Assinaturas</span>
+                </button>
+                
+                <button class="sidebar-item w-full text-left p-3 flex items-center space-x-3" data-section="estatisticas">
+                    <i class="fas fa-chart-bar w-5"></i>
+                    <span class="sidebar-text">Estatísticas</span>
+                </button>
+                
+                <button class="sidebar-item w-full text-left p-3 flex items-center space-x-3" data-section="configuracoes">
+                    <i class="fas fa-cog w-5"></i>
+                    <span class="sidebar-text">Configurações</span>
+                </button>
+            </nav>
+            
+            <!-- User Info -->
+            <div class="p-4 border-t border-white border-opacity-20">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user-shield text-sm"></i>
+                    </div>
+                    <div class="sidebar-text">
+                        <p class="text-sm font-semibold" id="adminName">Admin</p>
+                        <p class="text-xs text-white text-opacity-70">Administrador</p>
+                    </div>
+                </div>
+                
+                <div class="mt-3 space-y-2">
+                    <button id="voltarSistema" class="sidebar-item w-full text-left p-2 flex items-center space-x-2 text-sm">
+                        <i class="fas fa-arrow-left w-4"></i>
+                        <span class="sidebar-text">Voltar ao Sistema</span>
+                    </button>
+                    
+                    <button id="logout" class="sidebar-item w-full text-left p-2 flex items-center space-x-2 text-sm">
+                        <i class="fas fa-sign-out-alt w-4"></i>
+                        <span class="sidebar-text">Sair</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 content-area flex flex-col">
+            <!-- Top Bar -->
+            <header class="bg-white border-b border-gray-200 px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 id="pageTitle" class="text-2xl font-bold text-gray-800">Dashboard</h1>
+                        <p id="pageSubtitle" class="text-gray-600">Visão geral do sistema</p>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <button id="refreshData" class="btn-admin bg-blue-500 hover:bg-blue-600 text-white px-4 py-2">
+                            <i class="fas fa-sync-alt mr-2"></i>
+                            Atualizar
+                        </button>
+                        
+                        <div class="text-right">
+                            <p class="text-sm text-gray-600">Último acesso</p>
+                            <p id="ultimoAcesso" class="text-sm font-semibold text-gray-800">Agora</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Content Sections -->
+            <main class="flex-1 p-6 overflow-y-auto">
+                <!-- Dashboard Section -->
+                <div id="section-dashboard" class="space-y-6">
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="stat-card p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-white text-opacity-80">Usuários Totais</p>
+                                    <p id="totalUsuarios" class="text-3xl font-bold">0</p>
+                                </div>
+                                <i class="fas fa-users text-3xl text-white text-opacity-60"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-white text-opacity-80">Usuários Ativos</p>
+                                    <p id="usuariosAtivos" class="text-3xl font-bold">0</p>
+                                </div>
+                                <i class="fas fa-user-check text-3xl text-white text-opacity-60"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-white text-opacity-80">Assinantes Pagos</p>
+                                    <p id="assinantePagos" class="text-3xl font-bold">0</p>
+                                </div>
+                                <i class="fas fa-crown text-3xl text-white text-opacity-60"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-white text-opacity-80">Jogos Gerados</p>
+                                    <p id="jogosGerados" class="text-3xl font-bold">0</p>
+                                </div>
+                                <i class="fas fa-dice text-3xl text-white text-opacity-60"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Charts Row -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="table-container p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                                <i class="fas fa-chart-line mr-2 text-purple-500"></i>
+                                Usuários por Período
+                            </h3>
+                            <canvas id="usuariosPorPeriodoChart" height="200"></canvas>
+                        </div>
+                        
+                        <div class="table-container p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                                <i class="fas fa-chart-pie mr-2 text-purple-500"></i>
+                                Tipos de Assinatura
+                            </h3>
+                            <canvas id="tiposAssinaturaChart" height="200"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Activity Feed -->
+                    <div class="table-container p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-clock mr-2 text-purple-500"></i>
+                            Atividade Recente
+                        </h3>
+                        <div id="activityFeed" class="space-y-3">
+                            <!-- Atividades serão carregadas dinamicamente -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Usuarios Section -->
+                <div id="section-usuarios" class="space-y-6 hidden">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-800">Gerenciar Usuários</h2>
+                            <p class="text-gray-600">Visualize e gerencie todos os usuários do sistema</p>
+                        </div>
+                        
+                        <div class="flex space-x-3">
+                            <input type="text" id="searchUsuarios" placeholder="Buscar usuários..." 
+                                   class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <button id="exportarUsuarios" class="btn-admin bg-green-500 hover:bg-green-600 text-white px-4 py-2">
+                                <i class="fas fa-download mr-2"></i>
+                                Exportar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50 border-b border-gray-200">
+                                    <tr>
+                                        <th class="text-left py-3 px-6 font-semibold text-gray-600">Usuário</th>
+                                        <th class="text-left py-3 px-6 font-semibold text-gray-600">Email</th>
+                                        <th class="text-left py-3 px-6 font-semibold text-gray-600">Assinatura</th>
+                                        <th class="text-left py-3 px-6 font-semibold text-gray-600">Status</th>
+                                        <th class="text-left py-3 px-6 font-semibold text-gray-600">Cadastro</th>
+                                        <th class="text-left py-3 px-6 font-semibold text-gray-600">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaUsuarios" class="divide-y divide-gray-200">
+                                    <!-- Usuários serão carregados dinamicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Assinaturas Section -->
+                <div id="section-assinaturas" class="space-y-6 hidden">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-800">Gestão de Assinaturas</h2>
+                            <p class="text-gray-600">Controle os planos e pagamentos dos usuários</p>
+                        </div>
+                        
+                        <button id="configurarPlanos" class="btn-admin bg-purple-500 hover:bg-purple-600 text-white px-4 py-2">
+                            <i class="fas fa-cog mr-2"></i>
+                            Configurar Planos
+                        </button>
+                    </div>
+                    
+                    <!-- Resumo de Assinaturas -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="table-container p-6 text-center">
+                            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-gift text-yellow-600 text-xl"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-800">Teste Gratuito</h3>
+                            <p id="countTeste" class="text-2xl font-bold text-yellow-600 mt-2">0</p>
+                        </div>
+                        
+                        <div class="table-container p-6 text-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-calendar text-blue-600 text-xl"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-800">Mensal</h3>
+                            <p id="countMensal" class="text-2xl font-bold text-blue-600 mt-2">0</p>
+                        </div>
+                        
+                        <div class="table-container p-6 text-center">
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-calendar-alt text-green-600 text-xl"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-800">Semestral</h3>
+                            <p id="countSemestral" class="text-2xl font-bold text-green-600 mt-2">0</p>
+                        </div>
+                        
+                        <div class="table-container p-6 text-center">
+                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-crown text-purple-600 text-xl"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-800">Anual</h3>
+                            <p id="countAnual" class="text-2xl font-bold text-purple-600 mt-2">0</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Lista de Assinaturas -->
+                    <div class="table-container">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50 border-b border-gray-200">
+                                    <tr>
+                                        <th class="text-left py-3 px-6 font-semibold text-gray-600">Usuário</th>
+                                        <th class="text-left py-3 px-6 font-semibold text-gray-600">Plano</th>
+                                        <th class="text-left py-3 px-6 font-semibold text-gray-600">Vencimento</th>
+                                        <th class="text-left py-3 px-6 font-semibold text-gray-600">Status</th>
+                                        <th class="text-left py-3 px-6 font-semibold text-gray-600">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaAssinaturas" class="divide-y divide-gray-200">
+                                    <!-- Assinaturas serão carregadas dinamicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Estatisticas Section -->
+                <div id="section-estatisticas" class="space-y-6 hidden">
+                    <h2 class="text-xl font-semibold text-gray-800">Estatísticas Detalhadas</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="table-container p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Estratégias Mais Usadas</h3>
+                            <canvas id="estrategiasChart" height="250"></canvas>
+                        </div>
+                        
+                        <div class="table-container p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Uso por Dia da Semana</h3>
+                            <canvas id="usoDiaChart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Configuracoes Section -->
+                <div id="section-configuracoes" class="space-y-6 hidden">
+                    <h2 class="text-xl font-semibold text-gray-800">Configurações do Sistema</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="table-container p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                                <i class="fas fa-credit-card mr-2 text-purple-500"></i>
+                                Planos de Assinatura
+                            </h3>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Preço Mensal (R$)</label>
+                                    <input type="number" id="precoMensal" class="w-full px-3 py-2 border border-gray-300 rounded-lg" value="29.90">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Preço Semestral (R$)</label>
+                                    <input type="number" id="precoSemestral" class="w-full px-3 py-2 border border-gray-300 rounded-lg" value="149.90">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Preço Anual (R$)</label>
+                                    <input type="number" id="precoAnual" class="w-full px-3 py-2 border border-gray-300 rounded-lg" value="299.90">
+                                </div>
+                                
+                                <button id="salvarPrecos" class="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 rounded-lg">
+                                    Salvar Preços
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                                <i class="fas fa-cog mr-2 text-purple-500"></i>
+                                Configurações Gerais
+                            </h3>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Dias de Teste Gratuito</label>
+                                    <input type="number" id="diasTeste" class="w-full px-3 py-2 border border-gray-300 rounded-lg" value="15">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Limite de Jogos por Dia (Teste)</label>
+                                    <input type="number" id="limiteJogosTeste" class="w-full px-3 py-2 border border-gray-300 rounded-lg" value="5">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Limite de Jogos por Dia (Pagos)</label>
+                                    <input type="number" id="limiteJogosPago" class="w-full px-3 py-2 border border-gray-300 rounded-lg" value="100">
+                                </div>
+                                
+                                <button id="salvarConfiguracoes" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg">
+                                    Salvar Configurações
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Modais -->
+    <!-- Modal de Confirmação -->
+    <div id="modalConfirmacao" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <div class="text-center">
+                <i id="iconConfirmacao" class="fas fa-question-circle text-4xl text-yellow-500 mb-4"></i>
+                <h3 id="tituloConfirmacao" class="text-xl font-bold text-gray-800 mb-2">Confirmar Ação</h3>
+                <p id="mensagemConfirmacao" class="text-gray-600 mb-6">Tem certeza que deseja prosseguir?</p>
+                
+                <div class="flex space-x-3">
+                    <button id="cancelarConfirmacao" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 rounded-lg">
+                        Cancelar
+                    </button>
+                    <button id="confirmarAcao" class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg">
+                        Confirmar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Verificação de Autenticação Obrigatória -->
+    <script>
+        // Verificação de autenticação obrigatória para admin
+        function verificarAutenticacaoAdmin() {
+            const isAuthenticated = localStorage.getItem('isAuthenticated');
+            const currentUser = localStorage.getItem('currentUser');
+            
+            // Se não estiver autenticado, redireciona para welcome.html
+            if (!isAuthenticated || isAuthenticated !== 'true' || !currentUser) {
+                console.log('Usuário não autenticado. Redirecionando para welcome.html');
+                window.location.href = 'welcome.html';
+                return false;
+            }
+            
+            try {
+                const userData = JSON.parse(currentUser);
+                if (!userData.email || !userData.nome) {
+                    throw new Error('Dados de usuário inválidos');
+                }
+                
+                // Verificar se é admin
+                if (userData.perfil !== 'admin') {
+                    console.log('Usuário sem permissão de admin. Redirecionando para index.html');
+                    window.location.href = 'index.html';
+                    return false;
+                }
+                
+                console.log('Usuário admin autenticado:', userData.nome);
+                return true;
+            } catch (error) {
+                console.error('Erro ao verificar autenticação admin:', error);
+                localStorage.removeItem('isAuthenticated');
+                localStorage.removeItem('currentUser');
+                window.location.href = 'welcome.html';
+                return false;
+            }
+        }
+
+        // Verifica autenticação antes de carregar a página
+        if (!verificarAutenticacaoAdmin()) {
+            // Para o carregamento da página se não autenticado
+            document.body.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial, sans-serif;"><p>Redirecionando...</p></div>';
+        }
+    </script>
+
+    <!-- Scripts -->
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/admin.js"></script>
+</body>
+</html>

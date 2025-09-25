@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem-vindo - LotoFácil Estratégica</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        .welcome-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            animation: gradientShift 8s ease-in-out infinite;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); }
+            50% { background: linear-gradient(135deg, #f093fb 0%, #667eea 50%, #764ba2 100%); }
+        }
+        
+        .welcome-card {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px rgba(102, 126, 234, 0.15);
+        }
+        
+        .btn-start {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-start::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-start:hover::before {
+            left: 100%;
+        }
+        
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+    
+    <script>
+        // Redirecionamento automático após 3 segundos se não houver interação
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 5000);
+    </script>
+</head>
+<body class="welcome-bg">
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="welcome-card rounded-2xl shadow-2xl p-8 max-w-4xl w-full">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
+                    <i class="fas fa-dice text-white text-3xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">LotoFácil Estratégica</h1>
+                <p class="text-gray-600 text-lg">Sua ferramenta profissional para análises estratégicas</p>
+            </div>
+            
+            <!-- Features -->
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <div class="feature-card bg-blue-50 p-6 rounded-xl text-center">
+                    <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-line text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">7 Estratégias Avançadas</h3>
+                    <p class="text-gray-600 text-sm">Análises matemáticas e estatísticas comprovadas</p>
+                </div>
+                
+                <div class="feature-card bg-green-50 p-6 rounded-xl text-center">
+                    <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-brain text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Inteligência Artificial</h3>
+                    <p class="text-gray-600 text-sm">Algoritmos inteligentes de geração de jogos</p>
+                </div>
+                
+                <div class="feature-card bg-purple-50 p-6 rounded-xl text-center">
+                    <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-crown text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Planos Flexíveis</h3>
+                    <p class="text-gray-600 text-sm">15 dias grátis, mensal, semestral ou anual</p>
+                </div>
+            </div>
+            
+            <!-- Benefícios -->
+            <div class="bg-gray-50 rounded-xl p-6 mb-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">
+                    <i class="fas fa-star text-yellow-500 mr-2"></i>
+                    Por que escolher o LotoFácil Estratégica?
+                </h3>
+                
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                        <div>
+                            <p class="font-semibold text-gray-800">Análises Científicas</p>
+                            <p class="text-sm text-gray-600">Baseado em estatísticas reais da Caixa</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                        <div>
+                            <p class="font-semibold text-gray-800">Interface Intuitiva</p>
+                            <p class="text-sm text-gray-600">Fácil de usar para todos os níveis</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                        <div>
+                            <p class="font-semibold text-gray-800">Resultados Comprovados</p>
+                            <p class="text-sm text-gray-600">Estratégias testadas e aprovadas</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                        <div>
+                            <p class="font-semibold text-gray-800">Suporte Especializado</p>
+                            <p class="text-sm text-gray-600">Ajuda profissional quando precisar</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Call to Action -->
+            <div class="text-center">
+                <a href="login.html" class="btn-start inline-block text-white px-8 py-4 rounded-xl font-bold text-lg mb-4">
+                    <i class="fas fa-rocket mr-2"></i>
+                    Começar Agora - 15 Dias Grátis
+                </a>
+                
+                <div class="flex items-center justify-center space-x-4 text-sm text-gray-600">
+                    <div class="flex items-center">
+                        <i class="fas fa-shield-alt text-green-500 mr-1"></i>
+                        Seguro e Confiável
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-gift text-purple-500 mr-1"></i>
+                        Sem Cobrança Automática
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-clock text-blue-500 mr-1"></i>
+                        Acesso Imediato
+                    </div>
+                </div>
+                
+                <p class="text-xs text-gray-500 mt-4">
+                    Redirecionamento automático em <span id="countdown">5</span> segundos...
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Script de contagem regressiva -->
+    <script>
+        let countdown = 5;
+        const countdownElement = document.getElementById('countdown');
+        
+        const timer = setInterval(() => {
+            countdown--;
+            countdownElement.textContent = countdown;
+            
+            if (countdown <= 0) {
+                clearInterval(timer);
+                window.location.href = 'login.html';
+            }
+        }, 1000);
+        
+        // Para o timer se o usuário clicar no botão
+        document.querySelector('.btn-start').addEventListener('click', () => {
+            clearInterval(timer);
+        });
+    </script>
+</body>
+</html>

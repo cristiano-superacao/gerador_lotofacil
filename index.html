@@ -31,12 +31,42 @@
     <meta name="theme-color" content="#667eea">
     <link rel="icon" type="image/png" href="assets/images/favicon.png">
     <link rel="apple-touch-icon" href="assets/images/icon-192.png">
+    
+    <!-- CSS para garantir funcionamento do dropdown -->
+    <style>
+        #userDropdown {
+            position: absolute !important;
+            right: 0 !important;
+            top: 100% !important;
+            margin-top: 8px !important;
+            z-index: 9999 !important;
+            width: 16rem !important;
+            background-color: white !important;
+            border-radius: 0.5rem !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+            border: 1px solid #e5e7eb !important;
+            padding: 0.5rem 0 !important;
+        }
+        
+        #userDropdown.hidden {
+            display: none !important;
+        }
+        
+        #userArea {
+            position: relative !important;
+        }
+        
+        #userMenuBtn:hover {
+            background-color: rgba(255, 255, 255, 0.3) !important;
+        }
+    </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Cabeçalho fixo -->
     <header class="gradient-bg text-white shadow-lg sticky top-0 z-50">
         <div class="container mx-auto px-4 py-4">
             <div class="flex items-center justify-between">
+                <!-- Logo -->
                 <div class="flex items-center space-x-3">
                     <div class="bg-white text-purple-600 rounded-full p-3">
                         <i class="fas fa-dice text-2xl"></i>
@@ -46,16 +76,164 @@
                         <p class="text-purple-200 text-sm">Gere jogos inteligentes baseados em estatísticas</p>
                     </div>
                 </div>
-                <nav class="hidden md:flex space-x-6">
-                    <a href="#inicio" class="hover:text-purple-200 transition-colors">Início</a>
-                    <a href="#analises" class="hover:text-purple-200 transition-colors">Análises</a>
-                    <a href="#historico" class="hover:text-purple-200 transition-colors">Histórico</a>
-                    <a href="#rankings" class="hover:text-purple-200 transition-colors">Rankings</a>
-                    <a href="#sobre" class="hover:text-purple-200 transition-colors">Sobre</a>
-                </nav>
+
+                <!-- Menu Desktop: Navegação → Usuário → Sair -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <!-- Navegação -->
+                    <nav class="flex items-center space-x-6">
+                        <a href="#inicio" class="text-white hover:text-purple-200 transition-colors">Início</a>
+                        <a href="#analises" class="text-white hover:text-purple-200 transition-colors">Análises</a>
+                        <a href="#historico" class="text-white hover:text-purple-200 transition-colors">Histórico</a>
+                        <a href="#rankings" class="text-white hover:text-purple-200 transition-colors">Rankings</a>
+                    </nav>
+                    
+                    <!-- Menu do Usuário -->
+                    <div id="userArea" class="relative">
+                        <button id="userMenuBtn" class="flex items-center space-x-2 bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition-colors">
+                            <div class="w-8 h-8 bg-white bg-opacity-30 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-sm"></i>
+                            </div>
+                            <div class="text-left">
+                                <p id="userName" class="text-sm font-semibold">Usuário</p>
+                                <p id="userPlan" class="text-xs text-purple-200">Plano</p>
+                            </div>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div id="userDropdown" class="hidden absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50" style="position: absolute; right: 0; top: 100%; margin-top: 8px; z-index: 9999;">
+                            <!-- Info do usuário -->
+                            <div class="px-4 py-3 border-b border-gray-200">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-white"></i>
+                                    </div>
+                                    <div>
+                                        <p id="dropdownUserName" class="font-semibold text-gray-800">Usuário</p>
+                                        <p id="dropdownUserPlan" class="text-sm text-gray-600">Plano</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Contador de jogos -->
+                            <div class="px-4 py-3 border-b border-gray-200">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Jogos hoje:</span>
+                                    <span id="contadorJogos" class="text-sm font-bold text-purple-600">0/5</span>
+                                </div>
+                                <div class="mt-2 bg-gray-200 rounded-full h-2">
+                                    <div id="progressBarJogos" class="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Menu items -->
+                            <div class="py-1 border-t border-gray-200">
+                                <button id="perfilBtn" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                                    <i class="fas fa-user-cog w-4 mr-3 text-gray-400"></i>
+                                    Meu Perfil
+                                </button>
+                                
+                                <button id="planoBtn" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                                    <i class="fas fa-crown w-4 mr-3 text-gray-400"></i>
+                                    Gerenciar Plano
+                                </button>
+                                
+                                <button id="adminPanelBtn" class="hidden w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                                    <i class="fas fa-cog w-4 mr-3 text-gray-400"></i>
+                                    Painel Admin
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botão Sair -->
+                    <button id="logoutBtn" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg text-sm transition-colors flex items-center space-x-2">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Sair</span>
+                    </button>
+                </div>
+
+                <!-- Botão menu mobile -->
+                <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition-colors">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
             </div>
         </div>
     </header>
+
+    <!-- Menu Mobile -->
+    <div id="mobileMenu" class="hidden md:hidden bg-white shadow-lg border-t">
+        <nav class="container mx-auto px-4 py-4">
+            <div class="space-y-3">
+                <a href="#inicio" class="block py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i class="fas fa-home w-6 mr-3 text-gray-400"></i>
+                    Início
+                </a>
+                <a href="#analises" class="block py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i class="fas fa-chart-line w-6 mr-3 text-gray-400"></i>
+                    Análises
+                </a>
+                <a href="#historico" class="block py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i class="fas fa-history w-6 mr-3 text-gray-400"></i>
+                    Histórico
+                </a>
+                <a href="#rankings" class="block py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i class="fas fa-trophy w-6 mr-3 text-gray-400"></i>
+                    Rankings
+                </a>
+                
+                <div class="border-t border-gray-200 pt-3">
+                    <!-- Info do usuário mobile -->
+                    <div id="mobileUserInfo" class="hidden bg-gray-50 rounded-lg p-3 mb-3">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                            <div>
+                                <p id="mobileUserName" class="font-semibold text-gray-800">Usuário</p>
+                                <p id="mobileUserPlan" class="text-sm text-gray-600">Plano</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Contador de jogos mobile -->
+                        <div class="mb-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">Jogos hoje:</span>
+                                <span id="mobileContadorJogos" class="text-sm font-bold text-purple-600">0/5</span>
+                            </div>
+                            <div class="mt-2 bg-gray-200 rounded-full h-2">
+                                <div id="mobileProgressBarJogos" class="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Outros botões mobile -->
+                        <div class="space-y-2 border-t border-gray-200 pt-2">
+                            <button id="mobilePerfilBtn" class="w-full text-left py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg flex items-center">
+                                <i class="fas fa-user-cog w-6 mr-3 text-gray-400"></i>
+                                Meu Perfil
+                            </button>
+                            
+                            <button id="mobilePlanoBtn" class="w-full text-left py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg flex items-center">
+                                <i class="fas fa-crown w-6 mr-3 text-gray-400"></i>
+                                Gerenciar Plano
+                            </button>
+                            
+                            <button id="mobileAdminPanelBtn" class="hidden w-full text-left py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg flex items-center">
+                                <i class="fas fa-cog w-6 mr-3 text-gray-400"></i>
+                                Painel Admin
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Botão Sair Mobile -->
+                    <button id="mobileLogoutBtn" class="w-full bg-white bg-opacity-20 hover:bg-opacity-30 text-white py-2 px-3 rounded-lg flex items-center justify-center mb-3 border border-white border-opacity-30">
+                        <i class="fas fa-sign-out-alt mr-2"></i>
+                        Sair
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </div>
 
     <!-- Conteúdo principal -->
     <main class="container mx-auto px-4 py-8">
@@ -67,7 +245,7 @@
                         <i class="fas fa-trophy text-yellow-500 mr-3"></i>
                         Último Resultado
                     </h2>
-                    <button id="atualizarResultado" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                    <button id="atualizarResultado" class="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-4 py-2 rounded-lg transition-all duration-300">
                         <i class="fas fa-sync-alt mr-2"></i>
                         Atualizar
                     </button>
@@ -304,11 +482,17 @@
                     </p>
                 </div>
                 <div>
-                    <h4 class="font-semibold mb-3">Links</h4>
+                    <h4 class="font-semibold mb-3">Fale Conosco</h4>
                     <ul class="space-y-2 text-sm text-gray-400">
-                        <li><a href="#sobre" class="hover:text-white transition-colors">Sobre</a></li>
-                        <li><a href="#contato" class="hover:text-white transition-colors">Contato</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">GitHub</a></li>
+                        <li><a href="#contato" class="hover:text-white transition-colors">Contato: Cristiano Santos</a></li>
+                        <li><a href="https://wa.me/5571993372960" class="hover:text-white transition-colors flex items-center">
+                            <i class="fab fa-whatsapp text-green-400 mr-2"></i>
+                            Fone: (71) 99337-2960
+                        </a></li>
+                        <li><a href="#" class="hover:text-white transition-colors flex items-center">
+                            <i class="fab fa-instagram text-pink-400 mr-2"></i>
+                            Instagram
+                        </a></li>
                     </ul>
                 </div>
                 <div>
@@ -327,6 +511,364 @@
     </footer>
 
     <!-- JavaScript principal -->
+    <script src="assets/js/auth.js"></script>
     <script src="assets/js/app.js"></script>
+    
+    <!-- Modal de limite atingido -->
+    <div id="modalLimite" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <div class="text-center">
+                <i class="fas fa-exclamation-triangle text-yellow-500 text-4xl mb-4"></i>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Limite Atingido</h3>
+                <p id="mensagemLimite" class="text-gray-600 mb-6">
+                    Você atingiu o limite de jogos para seu plano atual.
+                </p>
+                
+                <div class="space-y-3">
+                    <div class="bg-blue-50 p-4 rounded-lg text-left">
+                        <h4 class="font-semibold text-blue-800 mb-2">
+                            <i class="fas fa-crown mr-2"></i>
+                            Atualize seu plano
+                        </h4>
+                        <ul class="text-sm text-blue-700 space-y-1">
+                            <li>• <strong>Mensal:</strong> R$ 29,90 - Jogos ilimitados</li>
+                            <li>• <strong>Semestral:</strong> R$ 149,90 - Economia de 17%</li>
+                            <li>• <strong>Anual:</strong> R$ 299,90 - Economia de 31%</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button id="fecharModalLimite" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 rounded-lg">
+                            Continuar Teste
+                        </button>
+                        <button id="atualizarPlano" class="flex-1 bg-purple-500 hover:bg-purple-600 text-white py-2 rounded-lg">
+                            Atualizar Plano
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Script de inicialização da autenticação -->
+    <script>
+        // Verificação de autenticação obrigatória
+        function verificarAutenticacao() {
+            const isAuthenticated = localStorage.getItem('isAuthenticated');
+            const currentUser = localStorage.getItem('currentUser');
+            
+            // Se não estiver autenticado, redireciona para welcome.html
+            if (!isAuthenticated || isAuthenticated !== 'true' || !currentUser) {
+                console.log('Usuário não autenticado. Redirecionando para welcome.html');
+                window.location.href = 'welcome.html';
+                return false;
+            }
+            
+            try {
+                const userData = JSON.parse(currentUser);
+                if (!userData.email || !userData.nome) {
+                    throw new Error('Dados de usuário inválidos');
+                }
+                console.log('Usuário autenticado:', userData.nome);
+                return true;
+            } catch (error) {
+                console.error('Erro ao verificar autenticação:', error);
+                localStorage.removeItem('isAuthenticated');
+                localStorage.removeItem('currentUser');
+                window.location.href = 'welcome.html';
+                return false;
+            }
+        }
+
+        // Verifica autenticação antes de carregar a página
+        if (!verificarAutenticacao()) {
+            // Para o carregamento da página se não autenticado
+            document.body.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100vh;"><p>Redirecionando...</p></div>';
+        }
+
+        // Inicialização da autenticação na página principal
+        document.addEventListener('DOMContentLoaded', () => {
+            // Verifica novamente na DOMContentLoaded por segurança
+            if (!verificarAutenticacao()) {
+                return;
+            }
+            
+            const authManager = new AuthManager();
+            const usuario = authManager.obterUsuarioLogado();
+            
+            const userArea = document.getElementById('userArea');
+            
+            if (usuario) {
+                // Usuário logado - mostra área do usuário
+                userArea.classList.remove('hidden');
+                
+                // Atualiza informações do usuário no botão e dropdown
+                const nomeUsuario = usuario.nome.split(' ')[0];
+                const planoUsuario = getPlanoLabel(usuario.assinatura);
+                
+                document.getElementById('userName').textContent = nomeUsuario;
+                document.getElementById('userPlan').textContent = planoUsuario;
+                document.getElementById('dropdownUserName').textContent = usuario.nome;
+                document.getElementById('dropdownUserPlan').textContent = planoUsuario;
+                
+                // Atualiza informações mobile
+                const mobileUserInfo = document.getElementById('mobileUserInfo');
+                mobileUserInfo.classList.remove('hidden');
+                document.getElementById('mobileUserName').textContent = usuario.nome;
+                document.getElementById('mobileUserPlan').textContent = planoUsuario;
+                
+                // Atualiza contador de jogos
+                atualizarContadorJogos(usuario, authManager);
+                
+                // Mostra botão admin se for admin
+                if (usuario.tipo === 'ADMIN') {
+                    document.getElementById('adminPanelBtn').classList.remove('hidden');
+                    document.getElementById('adminPanelBtn').classList.add('flex');
+                    document.getElementById('mobileAdminPanelBtn').classList.remove('hidden');
+                    document.getElementById('mobileAdminPanelBtn').classList.add('flex');
+                }
+                
+                // Controle do menu mobile
+                const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+                const mobileMenu = document.getElementById('mobileMenu');
+                
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+                
+                // Controle do dropdown desktop - VERSÃO OTIMIZADA
+                console.log('=== INICIANDO CONTROLE DO DROPDOWN ===');
+                
+                // Aguarda um pouco para garantir que o DOM está pronto
+                setTimeout(() => {
+                    const userMenuBtn = document.getElementById('userMenuBtn');
+                    const userDropdown = document.getElementById('userDropdown');
+                    
+                    console.log('userMenuBtn encontrado:', !!userMenuBtn, userMenuBtn);
+                    console.log('userDropdown encontrado:', !!userDropdown, userDropdown);
+                    
+                    if (userMenuBtn && userDropdown) {
+                        console.log('Adicionando event listener ao botão');
+                        
+                        userMenuBtn.onclick = function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            console.log('CLIQUE NO BOTÃO DETECTADO!');
+                            
+                            if (userDropdown.style.display === 'block') {
+                                userDropdown.style.display = 'none';
+                                userDropdown.classList.add('hidden');
+                                console.log('Dropdown fechado');
+                            } else {
+                                userDropdown.style.display = 'block';
+                                userDropdown.classList.remove('hidden');
+                                console.log('Dropdown aberto');
+                            }
+                        };
+                        
+                        // Clique fora fecha o dropdown
+                        document.onclick = function(e) {
+                            if (!userArea.contains(e.target)) {
+                                userDropdown.style.display = 'none';
+                                userDropdown.classList.add('hidden');
+                            }
+                        };
+                        
+                        console.log('Event listeners configurados com sucesso!');
+                    } else {
+                        console.error('ERRO: Elementos não encontrados!');
+                        console.log('Todos os elementos do DOM:');
+                        console.log('userArea:', document.getElementById('userArea'));
+                        console.log('userMenuBtn:', document.getElementById('userMenuBtn'));
+                        console.log('userDropdown:', document.getElementById('userDropdown'));
+                    }
+                }, 100);
+                
+                // Controle do menu mobile
+                if (mobileMenuBtn && mobileMenu) {
+                    document.addEventListener('click', (e) => {
+                        if (mobileMenu && !mobileMenu.contains(e.target) && mobileMenuBtn && !mobileMenuBtn.contains(e.target)) {
+                            mobileMenu.classList.add('hidden');
+                        }
+                    });
+                }
+                
+                // Event listeners do dropdown
+                document.getElementById('perfilBtn').addEventListener('click', () => {
+                    alert('Funcionalidade de perfil será implementada em breve!');
+                    userDropdown.classList.add('hidden');
+                });
+                
+                document.getElementById('planoBtn').addEventListener('click', () => {
+                    alert('Funcionalidade de gerenciamento de plano será implementada em breve!');
+                    userDropdown.classList.add('hidden');
+                });
+                
+                document.getElementById('adminPanelBtn').addEventListener('click', () => {
+                    window.location.href = 'admin.html';
+                });
+                
+                // Event listener para logout desktop
+                const logoutBtn = document.getElementById('logoutBtn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        console.log('Botão logout clicado');
+                        if (confirm('Tem certeza que deseja sair?')) {
+                            console.log('Confirmado logout');
+                            try {
+                                // Limpar dados do localStorage diretamente
+                                localStorage.removeItem('currentUser');
+                                localStorage.removeItem('isAuthenticated');
+                                console.log('Dados removidos do localStorage');
+                                // Redirecionar para welcome.html
+                                window.location.href = 'welcome.html';
+                            } catch (error) {
+                                console.error('Erro no logout:', error);
+                                // Mesmo com erro, limpar e redirecionar
+                                localStorage.clear();
+                                window.location.href = 'welcome.html';
+                            }
+                        }
+                    });
+                } else {
+                    console.error('Botão logout não encontrado');
+                }
+                
+                // Event listeners mobile
+                document.getElementById('mobilePerfilBtn').addEventListener('click', () => {
+                    alert('Funcionalidade de perfil será implementada em breve!');
+                    mobileMenu.classList.add('hidden');
+                });
+                
+                document.getElementById('mobilePlanoBtn').addEventListener('click', () => {
+                    alert('Funcionalidade de gerenciamento de plano será implementada em breve!');
+                    mobileMenu.classList.add('hidden');
+                });
+                
+                document.getElementById('mobileAdminPanelBtn').addEventListener('click', () => {
+                    window.location.href = 'admin.html';
+                });
+                
+                // Event listener para logout mobile
+                const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+                if (mobileLogoutBtn) {
+                    mobileLogoutBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        console.log('Botão mobile logout clicado');
+                        if (confirm('Tem certeza que deseja sair?')) {
+                            console.log('Confirmado mobile logout');
+                            try {
+                                // Limpar dados do localStorage diretamente
+                                localStorage.removeItem('currentUser');
+                                localStorage.removeItem('isAuthenticated');
+                                console.log('Dados removidos do localStorage (mobile)');
+                                // Redirecionar para welcome.html
+                                window.location.href = 'welcome.html';
+                            } catch (error) {
+                                console.error('Erro no mobile logout:', error);
+                                // Mesmo com erro, limpar e redirecionar
+                                localStorage.clear();
+                                window.location.href = 'welcome.html';
+                            }
+                        }
+                    });
+                } else {
+                    console.error('Botão mobile logout não encontrado');
+                }
+                
+                // Atualiza o app principal para verificar limites
+                if (window.lotofacilEstrategica) {
+                    window.lotofacilEstrategica.setAuthManager(authManager);
+                }
+            } else {
+                // Usuário não logado - redireciona para login imediatamente
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            function getPlanoLabel(tipo) {
+                const labels = {
+                    TESTE: 'Teste Gratuito',
+                    MENSAL: 'Plano Mensal',
+                    SEMESTRAL: 'Plano Semestral', 
+                    ANUAL: 'Plano Anual'
+                };
+                return labels[tipo] || 'Plano';
+            }
+            
+            function atualizarContadorJogos(usuario, authManager) {
+                const hoje = new Date().toDateString();
+                const jogosHoje = usuario.jogosGerados?.filter(j => 
+                    new Date(j.data).toDateString() === hoje
+                ).length || 0;
+                
+                const limites = {
+                    TESTE: 5,
+                    MENSAL: 100,
+                    SEMESTRAL: 100,
+                    ANUAL: 100
+                };
+                
+                const limite = limites[usuario.assinatura] || 5;
+                const contador = document.getElementById('contadorJogos');
+                const progressBar = document.getElementById('progressBarJogos');
+                const mobileContador = document.getElementById('mobileContadorJogos');
+                const mobileProgressBar = document.getElementById('mobileProgressBarJogos');
+                
+                const textoContador = `${jogosHoje}/${limite}`;
+                const porcentagem = Math.min((jogosHoje / limite) * 100, 100);
+                
+                // Atualiza contadores
+                if (contador) contador.textContent = textoContador;
+                if (mobileContador) mobileContador.textContent = textoContador;
+                
+                // Atualiza barras de progresso
+                [progressBar, mobileProgressBar].forEach(bar => {
+                    if (bar) {
+                        bar.style.width = `${porcentagem}%`;
+                        
+                        // Remove classes anteriores
+                        bar.classList.remove('from-purple-500', 'to-blue-500', 'from-red-500', 'to-red-600', 'from-yellow-500', 'to-yellow-600');
+                        
+                        // Muda cor baseada no uso
+                        if (jogosHoje >= limite) {
+                            bar.classList.add('from-red-500', 'to-red-600');
+                        } else if (jogosHoje >= limite * 0.8) {
+                            bar.classList.add('from-yellow-500', 'to-yellow-600');
+                        } else {
+                            bar.classList.add('from-purple-500', 'to-blue-500');
+                        }
+                    }
+                });
+                
+                // Atualiza cor dos contadores
+                [contador, mobileContador].forEach(cont => {
+                    if (cont) {
+                        cont.classList.remove('text-purple-600', 'text-yellow-600', 'text-red-600');
+                        
+                        if (jogosHoje >= limite) {
+                            cont.classList.add('text-red-600');
+                        } else if (jogosHoje >= limite * 0.8) {
+                            cont.classList.add('text-yellow-600');
+                        } else {
+                            cont.classList.add('text-purple-600');
+                        }
+                    }
+                });
+            }
+            
+            // Modal de limite
+            document.getElementById('fecharModalLimite').addEventListener('click', () => {
+                document.getElementById('modalLimite').classList.add('hidden');
+                document.getElementById('modalLimite').classList.remove('flex');
+            });
+            
+            document.getElementById('atualizarPlano').addEventListener('click', () => {
+                alert('Funcionalidade de pagamento será implementada em breve!');
+            });
+        });
+    </script>
 </body>
 </html>
