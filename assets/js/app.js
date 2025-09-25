@@ -8,7 +8,6 @@ class LotofacilEstrategica {
         this.estrategiaAtual = null;
         this.dadosOficiais = null;
         this.estatisticas = null;
-        this.authManager = null;
         
         // Definição das 7 análises estratégicas
         this.analises = [
@@ -123,76 +122,6 @@ class LotofacilEstrategica {
         `;
         
         return card;
-    }
-    
-    // Define o AuthManager para verificações de limite
-    setAuthManager(authManager) {
-        this.authManager = authManager;
-    }
-    
-    // Verifica se o usuário pode gerar jogos
-    verificarLimiteJogos() {
-        if (!this.authManager) {
-            return { pode: false, motivo: 'Sistema de autenticação não inicializado' };
-        }
-        
-        const usuario = this.authManager.obterUsuarioLogado();
-        if (!usuario) {
-            return { pode: false, motivo: 'Usuário não está logado' };
-        }
-        
-        const hoje = new Date().toDateString();
-        const jogosHoje = usuario.jogosGerados?.filter(j => 
-            new Date(j.data).toDateString() === hoje
-        ).length || 0;
-        
-        const limites = {
-            TESTE: 5,
-            MENSAL: 100,
-            SEMESTRAL: 100,
-            ANUAL: 100
-        };
-        
-        const limite = limites[usuario.assinatura] || 5;
-        
-        if (jogosHoje >= limite) {
-            return { 
-                pode: false, 
-                motivo: `Limite de ${limite} jogos por dia atingido`,
-                limite,
-                usado: jogosHoje,
-                plano: usuario.assinatura
-            };
-        }
-        
-        return { 
-            pode: true, 
-            limite, 
-            usado: jogosHoje,
-            restante: limite - jogosHoje
-        };
-    }
-    
-    // Mostra modal de limite atingido
-    mostrarModalLimite(info) {
-        const modal = document.getElementById('modalLimite');
-        const mensagem = document.getElementById('mensagemLimite');
-        
-        if (info.plano === 'TESTE') {
-            mensagem.textContent = `Você atingiu o limite de ${info.limite} jogos gratuitos por dia. Atualize seu plano para continuar gerando jogos ilimitados.`;
-        } else {
-            mensagem.textContent = `Limite diário de ${info.limite} jogos atingido. Tente novamente amanhã ou entre em contato com o suporte.`;
-        }
-        
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    }
-    
-    // Registra jogo gerado para o usuário
-    registrarJogoGerado() {
-        if (this.authManager) {
-            this.authManager.registrarJogoGerado();
-        }
     }
     
     configurarEventos() {
@@ -407,36 +336,15 @@ class LotofacilEstrategica {
     
     // Atualiza contador de jogos no header
     atualizarContadorJogos() {
-        if (this.authManager) {
-            const usuario = this.authManager.obterUsuarioLogado();
-            if (usuario) {
-                const hoje = new Date().toDateString();
-                const jogosHoje = usuario.jogosGerados?.filter(j => 
-                    new Date(j.data).toDateString() === hoje
-                ).length || 0;
-                
-                const limites = {
-                    TESTE: 5,
-                    MENSAL: 100,
-                    SEMESTRAL: 100,
-                    ANUAL: 100
-                };
-                
-                const limite = limites[usuario.assinatura] || 5;
-                
-                // Adiciona indicador visual se não existir
-                let contador = document.getElementById('contadorJogos');
-                if (!contador && document.getElementById('userArea')) {
-                    contador = document.createElement('div');
-                    contador.id = 'contadorJogos';
-                    contador.className = 'text-xs text-purple-200';
-                    document.getElementById('userArea').appendChild(contador);
-                }
-                
-                if (contador) {
-                    contador.textContent = `${jogosHoje}/${limite} jogos hoje`;
-                }
-            }
+        // Contador simplificado sem dependência de autenticação
+        const jogosHoje = this.jogosGerados.filter(jogo => {
+            const hoje = new Date().toDateString();
+            return new Date(jogo.timestamp).toDateString() === hoje;
+        }).length;
+        
+        const contador = document.getElementById('contadorJogos');
+        if (contador) {
+            contador.textContent = `${jogosHoje} jogos gerados hoje`;
         }
     }
     
