@@ -131,28 +131,53 @@
                             <input type="date" id="dataConcurso" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                         </div>
                         <div>
-                            <button id="salvarResultado" class="mt-6 w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
-                                <i class="fas fa-save mr-2"></i>
-                                Salvar
-                            </button>
+                            <label class="block text-sm font-semibold text-gray-600 mb-2">Valor do Prêmio (R$)</label>
+                            <input type="text" id="valorPremio" placeholder="Ex: 1.500.000,00" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                         </div>
                     </div>
                     
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-600 mb-2">Dezenas Sorteadas (15 números separados por vírgula)</label>
-                        <input type="text" id="dezenasUltimoResultado" placeholder="Ex: 01,02,03,04,05,06,07,08,09,10,11,12,13,14,15" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-600 mb-2">Dezenas Sorteadas (15 números separados por vírgula)</label>
+                            <input type="text" id="dezenasUltimoResultado" placeholder="Ex: 01,02,03,04,05,06,07,08,09,10,11,12,13,14,15" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-600 mb-2">Status do Prêmio</label>
+                            <select id="statusAcumulado" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                <option value="false">🎉 Houve Ganhador</option>
+                                <option value="true">💰 Acumulou</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button id="salvarResultado" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-save mr-2"></i>
+                            Salvar Resultado
+                        </button>
                     </div>
                 </div>
                 
                 <div id="ultimoResultadoDisplay" class="hidden">
-                    <div class="flex flex-wrap items-center justify-between mb-4">
-                        <div>
-                            <span class="text-sm text-gray-600">Concurso:</span>
-                            <span id="concursoDisplay" class="font-bold text-lg ml-2">-</span>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-blue-50 p-4 rounded-lg text-center">
+                            <span class="text-sm text-gray-600 block">Concurso</span>
+                            <span id="concursoDisplay" class="font-bold text-2xl text-blue-600">-</span>
                         </div>
-                        <div>
-                            <span class="text-sm text-gray-600">Data:</span>
-                            <span id="dataDisplay" class="font-bold text-lg ml-2">-</span>
+                        <div class="bg-green-50 p-4 rounded-lg text-center">
+                            <span class="text-sm text-gray-600 block">Data</span>
+                            <span id="dataDisplay" class="font-bold text-lg text-green-600">-</span>
+                        </div>
+                        <div class="bg-yellow-50 p-4 rounded-lg text-center">
+                            <span class="text-sm text-gray-600 block">Prêmio Principal</span>
+                            <span id="premioDisplay" class="font-bold text-lg text-yellow-600">-</span>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg text-center">
+                            <span class="text-sm text-gray-600 block">Status</span>
+                            <span id="acumuladoDisplay" class="font-bold text-lg">
+                                <i id="statusIcon" class="fas mr-1"></i>
+                                <span id="statusText">-</span>
+                            </span>
                         </div>
                     </div>
                     <div class="text-center">

@@ -225,9 +225,11 @@ class LotofacilEstrategica {
         const concurso = document.getElementById('concurso').value;
         const data = document.getElementById('dataConcurso').value;
         const dezenas = document.getElementById('dezenasUltimoResultado').value;
+        const valorPremio = document.getElementById('valorPremio').value;
+        const statusAcumulado = document.getElementById('statusAcumulado').value === 'true';
         
         if (!concurso || !data || !dezenas) {
-            this.mostrarAlerta('Por favor, preencha todos os campos!', 'warning');
+            this.mostrarAlerta('Por favor, preencha pelo menos concurso, data e dezenas!', 'warning');
             return;
         }
         
@@ -259,7 +261,9 @@ class LotofacilEstrategica {
         this.ultimoResultado = {
             concurso: parseInt(concurso),
             data: new Date(data).toLocaleDateString('pt-BR'),
-            dezenas: dezenasList.sort((a, b) => parseInt(a) - parseInt(b))
+            dezenas: dezenasList.sort((a, b) => parseInt(a) - parseInt(b)),
+            premio: valorPremio || 'Não informado',
+            acumulado: statusAcumulado
         };
         
         this.exibirUltimoResultado();
@@ -269,9 +273,34 @@ class LotofacilEstrategica {
     exibirUltimoResultado() {
         if (!this.ultimoResultado) return;
         
+        // Atualizar informações básicas
         document.getElementById('concursoDisplay').textContent = this.ultimoResultado.concurso;
         document.getElementById('dataDisplay').textContent = this.ultimoResultado.data;
         
+        // Atualizar prêmio
+        const premioDisplay = document.getElementById('premioDisplay');
+        if (premioDisplay) {
+            premioDisplay.textContent = this.ultimoResultado.premio || 'Não informado';
+        }
+        
+        // Atualizar status de acumulação
+        const acumuladoDisplay = document.getElementById('acumuladoDisplay');
+        const statusIcon = document.getElementById('statusIcon');
+        const statusText = document.getElementById('statusText');
+        
+        if (acumuladoDisplay && statusIcon && statusText) {
+            if (this.ultimoResultado.acumulado) {
+                statusIcon.className = 'fas fa-arrow-up mr-1';
+                statusText.textContent = 'Acumulou';
+                acumuladoDisplay.className = 'font-bold text-lg text-orange-600';
+            } else {
+                statusIcon.className = 'fas fa-trophy mr-1';
+                statusText.textContent = 'Houve Ganhador';
+                acumuladoDisplay.className = 'font-bold text-lg text-green-600';
+            }
+        }
+        
+        // Atualizar dezenas
         const dezenasContainer = document.getElementById('dezenasDisplay');
         dezenasContainer.innerHTML = '';
         
@@ -817,6 +846,20 @@ class LotofacilEstrategica {
             this.dadosOficiais = await window.apiCaixa.buscarUltimoConcurso();
             this.estatisticas = await window.apiCaixa.calcularEstatisticas();
             
+            // Salvar último resultado com todos os dados incluindo prêmio e acumulação
+            if (this.dadosOficiais) {
+                const numeros = window.apiCaixa.extrairNumerosSorteados(this.dadosOficiais);
+                const ultimoResultado = {
+                    concurso: this.dadosOficiais.numero,
+                    data: this.dadosOficiais.dataApuracao,
+                    numeros: numeros,
+                    premio: this.dadosOficiais.valorArrecadado || this.dadosOficiais.valorEstimadoProximoConcurso || 'N/A',
+                    acumulado: this.dadosOficiais.acumulado || false,
+                    timestamp: new Date().toISOString()
+                };
+                this.salvarUltimoResultado(ultimoResultado);
+            }
+            
             // Atualizar interface com dados oficiais
             this.atualizarInterfaceComDadosOficiais();
             
@@ -840,10 +883,30 @@ class LotofacilEstrategica {
         const ultimoResultadoEl = document.getElementById('ultimoResultado');
         if (ultimoResultadoEl) {
             const numeros = window.apiCaixa.extrairNumerosSorteados(this.dadosOficiais);
+            const premio = this.dadosOficiais.valorArrecadado || this.dadosOficiais.valorEstimadoProximoConcurso || 'N/A';
+            const acumulado = this.dadosOficiais.acumulado || false;
+            
             ultimoResultadoEl.innerHTML = `
                 <div class="text-center bg-gradient-to-r from-purple-500 to-blue-500 text-white p-4 rounded-lg">
                     <h3 class="font-bold mb-2">🎯 Último Resultado Oficial</h3>
-                    <p class="text-sm mb-2">Concurso ${this.dadosOficiais.numero} - ${this.dadosOficiais.dataApuracao}</p>
+                    <div class="grid grid-cols-4 gap-2 text-sm mb-3">
+                        <div>
+                            <i class="fas fa-trophy text-yellow-300"></i>
+                            <br>Concurso ${this.dadosOficiais.numero}
+                        </div>
+                        <div>
+                            <i class="fas fa-calendar text-blue-200"></i>
+                            <br>${this.dadosOficiais.dataApuracao}
+                        </div>
+                        <div>
+                            <i class="fas fa-money-bill-wave text-green-300"></i>
+                            <br>${typeof premio === 'number' ? 'R$ ' + premio.toLocaleString('pt-BR') : premio}
+                        </div>
+                        <div>
+                            <i class="fas ${acumulado ? 'fa-arrow-up text-red-300' : 'fa-check-circle text-green-300'}"></i>
+                            <br>${acumulado ? 'Acumulou' : 'Não acumulou'}
+                        </div>
+                    </div>
                     <div class="flex flex-wrap justify-center gap-1">
                         ${numeros.map(num => 
                             `<div class="number-ball-small bg-white text-purple-600">${num.toString().padStart(2, '0')}</div>`
