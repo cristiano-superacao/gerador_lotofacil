@@ -17,6 +17,12 @@
     <!-- Estilos customizados -->
     <link rel="stylesheet" href="assets/css/style.css">
     
+    <!-- API da Caixa -->
+    <script src="assets/js/api-caixa.js"></script>
+    
+    <!-- Histórico de Bilhetes -->
+    <script src="assets/js/historico-bilhetes.js"></script>
+    
     <meta name="description" content="Ferramenta inteligente para gerar jogos da Lotofácil baseados em estatísticas e estratégias comprovadas.">
     <meta name="keywords" content="lotofacil, estrategias, estatisticas, jogos, analises, numeros">
     <meta name="author" content="LotoFácil Estratégica">
@@ -43,6 +49,8 @@
                 <nav class="hidden md:flex space-x-6">
                     <a href="#inicio" class="hover:text-purple-200 transition-colors">Início</a>
                     <a href="#analises" class="hover:text-purple-200 transition-colors">Análises</a>
+                    <a href="#historico" class="hover:text-purple-200 transition-colors">Histórico</a>
+                    <a href="#rankings" class="hover:text-purple-200 transition-colors">Rankings</a>
                     <a href="#sobre" class="hover:text-purple-200 transition-colors">Sobre</a>
                 </nav>
             </div>
@@ -63,6 +71,17 @@
                         <i class="fas fa-sync-alt mr-2"></i>
                         Atualizar
                     </button>
+                </div>
+                
+                <!-- Indicador de carregamento -->
+                <div id="loadingIndicator" class="hidden text-center py-4">
+                    <i class="fas fa-spinner fa-spin mr-2"></i>
+                    <span>Carregando dados oficiais...</span>
+                </div>
+                
+                <!-- Dados oficiais da Caixa -->
+                <div id="ultimoResultado" class="mb-4">
+                    <!-- Será preenchido via JavaScript -->
                 </div>
                 
                 <div class="bg-gray-50 rounded-lg p-4 mb-4">
@@ -129,7 +148,7 @@
                 <div class="flex justify-between items-center mb-6">
                     <div>
                         <h3 id="estrategiaUsada" class="text-xl font-bold text-gray-800">-</h3>
-                        <p class="text-gray-600">7 jogos únicos gerados</p>
+                        <p class="text-gray-600">10 jogos únicos gerados</p>
                     </div>
                     <div class="flex space-x-2">
                         <button id="copiarJogos" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
@@ -152,6 +171,123 @@
                         <i class="fas fa-redo mr-2"></i>
                         Gerar Novos Jogos
                     </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção Histórico de Bilhetes -->
+        <section id="historico" class="mb-12 hidden">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 flex items-center">
+                    <i class="fas fa-history mr-3 text-purple-600"></i>
+                    Histórico de Bilhetes
+                </h2>
+                <div class="flex space-x-2">
+                    <button id="conferirSemana" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        Conferir Semana
+                    </button>
+                    <button id="exportarHistorico" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-download mr-2"></i>
+                        Exportar
+                    </button>
+                    <button id="limparHistorico" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-trash mr-2"></i>
+                        Limpar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filtros do Histórico -->
+            <div class="bg-white rounded-lg card-shadow p-6 mb-6">
+                <div class="grid md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600 mb-2">Estratégia</label>
+                        <select id="filtroEstrategia" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <option value="">Todas</option>
+                            <option value="Poder das Repetidas">Poder das Repetidas</option>
+                            <option value="Equilíbrio Par/Ímpar">Equilíbrio Par/Ímpar</option>
+                            <option value="Números Atrasados">Números Atrasados</option>
+                            <option value="Análise de Colunas">Análise de Colunas</option>
+                            <option value="Padrões de Sequência">Padrões de Sequência</option>
+                            <option value="Números Frios e Quentes">Números Frios e Quentes</option>
+                            <option value="Matemática dos Finais">Matemática dos Finais</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600 mb-2">Status</label>
+                        <select id="filtroStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <option value="">Todos</option>
+                            <option value="pendente">Pendentes</option>
+                            <option value="conferido">Conferidos</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600 mb-2">Data Início</label>
+                        <input type="date" id="filtroDataInicio" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600 mb-2">Data Fim</label>
+                        <input type="date" id="filtroDataFim" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button id="aplicarFiltros" class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg transition-colors mr-2">
+                        <i class="fas fa-filter mr-2"></i>
+                        Aplicar Filtros
+                    </button>
+                    <button id="limparFiltros" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-times mr-2"></i>
+                        Limpar Filtros
+                    </button>
+                </div>
+            </div>
+
+            <!-- Estatísticas Gerais -->
+            <div id="estatisticasGerais" class="grid md:grid-cols-4 gap-6 mb-6">
+                <!-- Será preenchido via JavaScript -->
+            </div>
+
+            <!-- Lista de Bilhetes -->
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <div id="listaBilhetes" class="space-y-4">
+                    <!-- Será preenchido via JavaScript -->
+                </div>
+                
+                <div id="nenhumBilhete" class="text-center py-12 text-gray-500 hidden">
+                    <i class="fas fa-ticket-alt text-6xl mb-4 text-gray-300"></i>
+                    <h3 class="text-xl font-bold mb-2">Nenhum bilhete encontrado</h3>
+                    <p>Gere alguns jogos para começar seu histórico de bilhetes.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção Rankings e Estatísticas -->
+        <section id="rankings" class="mb-12 hidden">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">
+                <i class="fas fa-trophy mr-3 text-yellow-500"></i>
+                Rankings e Estatísticas
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Ranking de Estratégias -->
+                <div class="bg-white rounded-lg card-shadow p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-medal mr-2 text-gold"></i>
+                        Ranking de Estratégias
+                    </h3>
+                    <div id="rankingEstrategias">
+                        <!-- Será preenchido via JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Distribuição de Acertos -->
+                <div class="bg-white rounded-lg card-shadow p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-chart-bar mr-2 text-blue-500"></i>
+                        Distribuição de Acertos
+                    </h3>
+                    <canvas id="chartAcertos" width="400" height="200"></canvas>
                 </div>
             </div>
         </section>

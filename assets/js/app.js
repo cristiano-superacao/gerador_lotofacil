@@ -6,6 +6,8 @@ class LotofacilEstrategica {
         this.ultimoResultado = null;
         this.jogosGerados = [];
         this.estrategiaAtual = null;
+        this.dadosOficiais = null;
+        this.estatisticas = null;
         
         // Definição das 7 análises estratégicas
         this.analises = [
@@ -108,7 +110,7 @@ class LotofacilEstrategica {
                 <button class="w-full bg-gradient-to-r ${analise.cor} text-white py-3 px-6 rounded-lg font-semibold hover:opacity-90 transition-opacity" 
                         onclick="lotofacil.gerarJogos(${analise.id})">
                     <i class="fas fa-magic mr-2"></i>
-                    Gerar 7 Jogos
+                    Gerar 10 Jogos
                 </button>
                 
                 <button class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-lg text-sm hover:bg-gray-50 transition-colors"
@@ -290,7 +292,7 @@ class LotofacilEstrategica {
         const jogos = [];
         const jogosUnicos = new Set();
         
-        while (jogos.length < 7) {
+        while (jogos.length < 10) {
             let novoJogo;
             
             switch (idAnalise) {
@@ -334,10 +336,20 @@ class LotofacilEstrategica {
     estrategiaPoderepetidas() {
         const jogo = [];
         
-        // Se temos último resultado, usar alguns números dele
-        if (this.ultimoResultado) {
-            const repetidas = this.ultimoResultado.dezenas
-                .map(n => parseInt(n))
+        // Usar dados oficiais se disponíveis, senão usar dados simulados
+        let numerosUltimoConcurso = [];
+        
+        if (this.dadosOficiais) {
+            numerosUltimoConcurso = window.apiCaixa.extrairNumerosSorteados(this.dadosOficiais);
+        } else if (this.ultimoResultado) {
+            numerosUltimoConcurso = this.ultimoResultado.dezenas.map(n => parseInt(n));
+        } else {
+            // Dados simulados como fallback
+            numerosUltimoConcurso = [2, 5, 7, 9, 12, 14, 16, 18, 20, 21, 22, 23, 24, 25, 1];
+        }
+        
+        if (numerosUltimoConcurso.length > 0) {
+            const repetidas = numerosUltimoConcurso
                 .sort(() => 0.5 - Math.random())
                 .slice(0, 5 + Math.floor(Math.random() * 3)); // 5-7 repetidas
             
@@ -520,6 +532,17 @@ class LotofacilEstrategica {
     exibirJogosGerados(nomeEstrategia) {
         document.getElementById('estrategiaUsada').textContent = nomeEstrategia;
         
+        // Salvar bilhete no histórico
+        const bilheteId = window.historicoBilhetes?.salvarBilhete(
+            this.jogosGerados, 
+            nomeEstrategia, 
+            this.dadosOficiais?.numero || null
+        );
+        
+        if (bilheteId) {
+            console.log(`✅ Bilhete salvo no histórico: ${bilheteId}`);
+        }
+        
         const container = document.getElementById('jogosGerados');
         container.innerHTML = '';
         
@@ -658,13 +681,374 @@ class LotofacilEstrategica {
             }
         }, 5000);
     }
+
+    /**
+     * Carrega dados oficiais da API da Caixa
+     */
+    async carregarDadosOficiais() {
+        try {
+            // Mostrar indicador de carregamento
+            this.mostrarCarregamento('Carregando dados oficiais da Caixa...');
+            
+            // Buscar último concurso e estatísticas
+            this.dadosOficiais = await window.apiCaixa.buscarUltimoConcurso();
+            this.estatisticas = await window.apiCaixa.calcularEstatisticas();
+            
+            // Atualizar interface com dados oficiais
+            this.atualizarInterfaceComDadosOficiais();
+            
+            this.esconderCarregamento();
+            
+            console.log('✅ Dados oficiais carregados:', this.dadosOficiais);
+            
+        } catch (error) {
+            console.warn('⚠️ Erro ao carregar dados oficiais:', error);
+            this.esconderCarregamento();
+        }
+    }
+
+    /**
+     * Atualiza a interface com dados oficiais da Caixa
+     */
+    atualizarInterfaceComDadosOficiais() {
+        if (!this.dadosOficiais) return;
+
+        // Atualizar último resultado no cabeçalho se existir
+        const ultimoResultadoEl = document.getElementById('ultimoResultado');
+        if (ultimoResultadoEl) {
+            const numeros = window.apiCaixa.extrairNumerosSorteados(this.dadosOficiais);
+            ultimoResultadoEl.innerHTML = `
+                <div class="text-center bg-gradient-to-r from-purple-500 to-blue-500 text-white p-4 rounded-lg">
+                    <h3 class="font-bold mb-2">🎯 Último Resultado Oficial</h3>
+                    <p class="text-sm mb-2">Concurso ${this.dadosOficiais.numero} - ${this.dadosOficiais.dataApuracao}</p>
+                    <div class="flex flex-wrap justify-center gap-1">
+                        ${numeros.map(num => 
+                            `<div class="number-ball-small bg-white text-purple-600">${num.toString().padStart(2, '0')}</div>`
+                        ).join('')}
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    /**
+     * Mostra indicador de carregamento
+     */
+    mostrarCarregamento(texto = 'Carregando...') {
+        const loading = document.getElementById('loadingIndicator');
+        if (loading) {
+            loading.textContent = texto;
+            loading.classList.remove('hidden');
+        }
+    }
+
+    /**
+     * Esconde indicador de carregamento
+     */
+    esconderCarregamento() {
+        const loading = document.getElementById('loadingIndicator');
+        if (loading) {
+            loading.classList.add('hidden');
+        }
+    }
+
+    // === FUNCIONALIDADES DO HISTÓRICO ===
+    
+    /**
+     * Inicializa funcionalidades do histórico
+     */
+    inicializarHistorico() {
+        // Configurar eventos dos botões
+        const btnConferirSemana = document.getElementById('conferirSemana');
+        const btnExportarHistorico = document.getElementById('exportarHistorico');
+        const btnLimparHistorico = document.getElementById('limparHistorico');
+        const btnAplicarFiltros = document.getElementById('aplicarFiltros');
+        const btnLimparFiltros = document.getElementById('limparFiltros');
+
+        if (btnConferirSemana) {
+            btnConferirSemana.addEventListener('click', () => this.conferirBilhetesDaSemana());
+        }
+
+        if (btnExportarHistorico) {
+            btnExportarHistorico.addEventListener('click', () => this.exportarHistoricoCompleto());
+        }
+
+        if (btnLimparHistorico) {
+            btnLimparHistorico.addEventListener('click', () => this.limparHistoricoCompleto());
+        }
+
+        if (btnAplicarFiltros) {
+            btnAplicarFiltros.addEventListener('click', () => this.aplicarFiltros());
+        }
+
+        if (btnLimparFiltros) {
+            btnLimparFiltros.addEventListener('click', () => this.limparFiltros());
+        }
+
+        // Carregar histórico inicial
+        this.atualizarInterfaceHistorico();
+    }
+
+    /**
+     * Confere bilhetes da semana
+     */
+    async conferirBilhetesDaSemana() {
+        if (!window.historicoBilhetes) return;
+
+        this.mostrarCarregamento('Conferindo bilhetes da semana...');
+
+        try {
+            const resultado = await window.historicoBilhetes.conferirBilhetesDaSemana();
+            
+            this.esconderCarregamento();
+            
+            if (resultado.bilhetesConferidos > 0) {
+                this.mostrarAlerta(
+                    `✅ ${resultado.bilhetesConferidos} bilhetes conferidos com sucesso!`,
+                    'success'
+                );
+                this.atualizarInterfaceHistorico();
+            } else {
+                this.mostrarAlerta(
+                    'ℹ️ Nenhum bilhete pendente encontrado para conferir.',
+                    'info'
+                );
+            }
+
+        } catch (error) {
+            this.esconderCarregamento();
+            this.mostrarAlerta('❌ Erro ao conferir bilhetes da semana.', 'error');
+            console.error('Erro ao conferir bilhetes:', error);
+        }
+    }
+
+    /**
+     * Remove bilhete do histórico
+     */
+    removerBilhete(bilheteId) {
+        if (!window.historicoBilhetes) return;
+
+        if (confirm('Tem certeza que deseja remover este bilhete?')) {
+            const removido = window.historicoBilhetes.removerBilhete(bilheteId);
+            if (removido) {
+                this.atualizarInterfaceHistorico();
+                this.mostrarAlerta('✅ Bilhete removido com sucesso!', 'success');
+            }
+        }
+    }
+
+    /**
+     * Exporta histórico completo
+     */
+    exportarHistoricoCompleto() {
+        if (!window.historicoBilhetes) return;
+
+        try {
+            const dadosExportacao = window.historicoBilhetes.exportarHistorico();
+            
+            const blob = new Blob([dadosExportacao], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `historico-lotofacil-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            URL.revokeObjectURL(url);
+            
+            this.mostrarAlerta('✅ Histórico exportado com sucesso!', 'success');
+
+        } catch (error) {
+            this.mostrarAlerta('❌ Erro ao exportar histórico.', 'error');
+            console.error('Erro na exportação:', error);
+        }
+    }
+
+    /**
+     * Limpa histórico completo
+     */
+    limparHistoricoCompleto() {
+        if (!window.historicoBilhetes) return;
+
+        if (confirm('⚠️ Tem certeza que deseja limpar todo o histórico? Esta ação não pode ser desfeita.')) {
+            window.historicoBilhetes.limparHistorico();
+            this.atualizarInterfaceHistorico();
+            this.mostrarAlerta('✅ Histórico limpo com sucesso!', 'success');
+        }
+    }
+
+    /**
+     * Aplica filtros ao histórico
+     */
+    aplicarFiltros() {
+        if (!window.historicoBilhetes) return;
+
+        const filtros = {
+            estrategia: document.getElementById('filtroEstrategia')?.value || '',
+            status: document.getElementById('filtroStatus')?.value || '',
+            dataInicio: document.getElementById('filtroDataInicio')?.value || '',
+            dataFim: document.getElementById('filtroDataFim')?.value || ''
+        };
+
+        this.atualizarInterfaceHistorico(filtros);
+    }
+
+    /**
+     * Limpa filtros
+     */
+    limparFiltros() {
+        document.getElementById('filtroEstrategia').value = '';
+        document.getElementById('filtroStatus').value = '';
+        document.getElementById('filtroDataInicio').value = '';
+        document.getElementById('filtroDataFim').value = '';
+        
+        this.atualizarInterfaceHistorico();
+    }
+
+    /**
+     * Atualiza interface do histórico
+     */
+    atualizarInterfaceHistorico(filtros = {}) {
+        if (!window.historicoBilhetes) return;
+
+        const bilhetes = window.historicoBilhetes.getHistorico(filtros);
+        const estatisticas = window.historicoBilhetes.getEstatisticasPorEstrategia();
+        
+        this.renderizarEstatisticasGerais(estatisticas);
+        this.renderizarListaBilhetes(bilhetes);
+        
+        // Mostrar seção do histórico se há bilhetes
+        if (bilhetes.length > 0) {
+            document.getElementById('historico')?.classList.remove('hidden');
+            document.getElementById('rankings')?.classList.remove('hidden');
+        }
+    }
+
+    /**
+     * Renderiza estatísticas gerais
+     */
+    renderizarEstatisticasGerais(estatisticas) {
+        const container = document.getElementById('estatisticasGerais');
+        if (!container) return;
+
+        const totalBilhetes = Object.values(estatisticas).reduce((total, stat) => total + stat.totalBilhetes, 0);
+        const totalPremios = Object.values(estatisticas).reduce((total, stat) => total + stat.totalPremios, 0);
+        const totalAcertos = Object.values(estatisticas).reduce((total, stat) => total + stat.totalAcertos, 0);
+        const totalJogos = Object.values(estatisticas).reduce((total, stat) => total + stat.totalJogos, 0);
+
+        container.innerHTML = `
+            <div class="bg-white rounded-lg card-shadow p-6 text-center">
+                <div class="text-3xl font-bold text-blue-600 mb-2">${totalBilhetes}</div>
+                <div class="text-gray-600">Bilhetes Gerados</div>
+            </div>
+            <div class="bg-white rounded-lg card-shadow p-6 text-center">
+                <div class="text-3xl font-bold text-green-600 mb-2">R$ ${totalPremios.toFixed(2)}</div>
+                <div class="text-gray-600">Total em Prêmios</div>
+            </div>
+            <div class="bg-white rounded-lg card-shadow p-6 text-center">
+                <div class="text-3xl font-bold text-purple-600 mb-2">${totalAcertos}</div>
+                <div class="text-gray-600">Total de Acertos</div>
+            </div>
+            <div class="bg-white rounded-lg card-shadow p-6 text-center">
+                <div class="text-3xl font-bold text-orange-600 mb-2">${totalJogos > 0 ? (totalAcertos / totalJogos).toFixed(1) : '0'}</div>
+                <div class="text-gray-600">Média Acertos/Jogo</div>
+            </div>
+        `;
+    }
+
+    /**
+     * Renderiza lista de bilhetes
+     */
+    renderizarListaBilhetes(bilhetes) {
+        const container = document.getElementById('listaBilhetes');
+        const nenhumBilhete = document.getElementById('nenhumBilhete');
+        
+        if (!container || !nenhumBilhete) return;
+
+        if (bilhetes.length === 0) {
+            container.classList.add('hidden');
+            nenhumBilhete.classList.remove('hidden');
+            return;
+        }
+
+        container.classList.remove('hidden');
+        nenhumBilhete.classList.add('hidden');
+
+        container.innerHTML = bilhetes.slice(0, 20).map(bilhete => {
+            const dataGeracao = new Date(bilhete.dataGeracao).toLocaleString('pt-BR');
+            const statusClass = bilhete.status === 'conferido' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
+            
+            let resultadosHtml = '';
+            if (bilhete.status === 'conferido' && bilhete.resultados.length > 0) {
+                resultadosHtml = `
+                    <div class="mt-3 p-3 bg-gray-50 rounded-lg">
+                        <div class="text-sm text-gray-600 mb-2">Melhor resultado: ${bilhete.melhorJogo.acertos} acertos</div>
+                        <div class="text-sm text-green-600 font-bold">Total em prêmios: R$ ${bilhete.totalPremios.toFixed(2)}</div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 class="font-bold text-lg">${bilhete.estrategia}</h4>
+                            <p class="text-gray-600 text-sm">${dataGeracao}</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="px-3 py-1 rounded-full text-xs font-medium ${statusClass}">
+                                ${bilhete.status === 'conferido' ? '✓ Conferido' : '⏳ Pendente'}
+                            </span>
+                            <button onclick="lotofacil.removerBilhete('${bilhete.id}')" 
+                                    class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="text-sm text-gray-600 mb-2">
+                        ${bilhete.jogos.length} jogos gerados
+                    </div>
+                    
+                    ${resultadosHtml}
+                </div>
+            `;
+        }).join('');
+
+        // Adicionar indicador se há mais bilhetes
+        if (bilhetes.length > 20) {
+            container.innerHTML += `
+                <div class="text-center py-4 text-gray-500">
+                    ... e mais ${bilhetes.length - 20} bilhetes
+                </div>
+            `;
+        }
+    }
 }
 
 // Inicializar aplicação
 const lotofacil = new LotofacilEstrategica();
 
-// Smooth scroll para âncoras
-document.addEventListener('DOMContentLoaded', function() {
+// Carregar dados oficiais quando a página carregar
+document.addEventListener('DOMContentLoaded', async function() {
+    // Carregar dados da API da Caixa
+    await lotofacil.carregarDadosOficiais();
+    
+    // Inicializar histórico de bilhetes
+    lotofacil.inicializarHistorico();
+    
+    // Configurar botão de atualizar dados
+    const btnAtualizar = document.getElementById('atualizarResultado');
+    if (btnAtualizar) {
+        btnAtualizar.addEventListener('click', () => {
+            window.apiCaixa.limparCache();
+            lotofacil.carregarDadosOficiais();
+        });
+    }
+    
+    // Smooth scroll para âncoras
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();

@@ -38,6 +38,19 @@
     overflow: hidden;
 }
 
+.number-ball-small {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin: 2px;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
 .number-ball::before {
     content: '';
     position: absolute;
