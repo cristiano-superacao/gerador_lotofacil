@@ -1,16 +1,12 @@
 # 🎯 LotoFácil Estratégica
 
-<div align="center">
+**Uma ferramenta de apoio para estudos e estratégias da Lotofácil — simples, confiável e prática.**
 
 ![Status](https://img.shields.io/badge/Status-Ativo-green)
 ![Versão](https://img.shields.io/badge/Versão-1.0.0-blue)
 ![Licença](https://img.shields.io/badge/Licença-MIT-yellow)
 
-**Uma ferramenta de apoio para estudos e estratégias da Lotofácil — simples, confiável e prática.**
-
-[🚀 Demonstração](#demonstração) • [📋 Funcionalidades](#funcionalidades) • [⚡ Como Usar](#como-usar) • [🧠 Estratégias](#estratégias)
-
-</div>
+[🚀 Demonstração](#-demonstração-local) • [📋 Funcionalidades](#-funcionalidades) • [⚡ Como Usar](#-como-usar) • [🧠 Estratégias](#-estratégias-implementadas)
 
 ---
 
@@ -24,11 +20,84 @@ Fornecer uma ferramenta baseada em análises estatísticas reais da Lotofácil, 
 
 ---
 
-## 🚀 Demonstração
+## 🚀 Como Acessar
 
-Para testar o site:
+### 🔐 Sistema de Autenticação
 
-1. Abra o arquivo `index.html` no seu navegador
+O LotoFácil Estratégica agora possui um sistema de autenticação profissional com:
+
+- **Conta Administrativa**: Gerenciamento completo do sistema
+- **Cadastro de Usuários**: Registro simples com nome, email e contato  
+- **Planos de Assinatura**: Teste gratuito de 15 dias, mensal, semestral e anual
+- **Controle de Acesso**: Limitação de jogos baseada no plano do usuário
+
+### 📱 Para Testar o Sistema
+
+1. **Página Inicial**: Abra `welcome.html` ou acesse diretamente `login.html`
+
+2. **Login de Demonstração (Admin)**:
+   - **Email**: `admin@lotofacilestrategica.com`
+   - **Senha**: `Admin@2024!`
+
+3. **Ou Crie uma Nova Conta**:
+   - Clique em "Registrar"
+   - Preencha: Nome, Email, Contato e Senha
+   - Receba 15 dias de teste gratuito
+
+### 🎯 Funcionalidades por Plano
+
+| Recurso | Teste (15 dias) | Mensal | Semestral | Anual |
+|---------|-----------------|---------|-----------|--------|
+| **Jogos por dia** | 5 | 100 | 100 | 100 |
+| **7 Estratégias** | ✅ | ✅ | ✅ | ✅ |
+| **Exportação** | ✅ | ✅ | ✅ | ✅ |
+| **Histórico** | ✅ | ✅ | ✅ | ✅ |
+| **Suporte** | Básico | Prioritário | Prioritário | VIP |
+
+---
+
+## 🚀 Demonstração Local
+
+Para testar o site localmente:
+
+1. **Clone o repositório**:
+
+```bash
+git clone https://github.com/cristiano-superacao/geradorlotofacil.git
+cd geradorlotofacil
+```
+
+1. **Inicie o servidor local**:
+
+**Opção 1 - Node.js** (recomendado):
+
+```bash
+npm install
+npm start
+# Ou manualmente: node server.js
+```
+
+**Opção 2 - Python**:
+
+```bash
+python server.py
+# Ou: python -m http.server 8000
+```
+
+**Opção 3 - Automática** (Windows/Linux):
+
+```bash
+# Windows
+run.bat
+
+# Linux/Mac  
+./run.sh
+```
+
+1. **Acesse no navegador**:
+   - **Node.js**: <http://localhost:3000>
+   - **Python**: <http://localhost:8000>
+   - Comece por `welcome.html` ou `login.html`
 2. Insira o último resultado da Lotofácil (opcional)
 3. Escolha uma das 7 estratégias disponíveis
 4. Clique em "Gerar 7 Jogos" e receba seus bilhetes otimizados
@@ -69,6 +138,7 @@ Para testar o site:
 #### **Método 1: Scripts Automáticos (Recomendado)**
 
 **Windows:**
+
 ```bash
 # Execute o script de automação
 run.bat
@@ -80,6 +150,7 @@ npm run serve      # Servidor Python na porta 8000
 ```
 
 **Linux/Mac:**
+
 ```bash
 # Torne o script executável
 chmod +x run.sh
@@ -96,6 +167,7 @@ npm run serve      # Servidor Python na porta 8000
 #### **Método 2: Servidor HTTP Simples**
 
 **Usando Python:**
+
 ```bash
 # Python 3
 python server.py [porta]    # Default: 8000
@@ -105,6 +177,7 @@ python -m http.server 8000
 ```
 
 **Usando Node.js:**
+
 ```bash
 # Com o servidor customizado
 node server.js [porta]      # Default: 3000
@@ -115,11 +188,13 @@ http-server . -p 3000
 ```
 
 **Usando Live Server (VS Code):**
+
 1. Instale a extensão "Live Server"
 2. Clique direito no `index.html`
 3. Selecione "Open with Live Server"
 
 #### **Método 3: Abrir Diretamente no Navegador**
+
 ```bash
 # Simplesmente abra o arquivo no navegador
 # Funciona, mas pode ter limitações com alguns recursos
@@ -128,7 +203,9 @@ http-server . -p 3000
 ### 🌐 **Hospedagem Web**
 
 #### **GitHub Pages (Gratuito)**
+
 1. **Push para GitHub:**
+
    ```bash
    git add .
    git commit -m "Deploy LotoFácil Estratégica"
@@ -146,13 +223,16 @@ http-server . -p 3000
    - Deploy automático a cada push na branch main
 
 #### **Netlify (Gratuito)**
+
 1. **Deploy via Git:**
+
    ```bash
    # Conecte seu repositório GitHub no Netlify
    # Deploy automático configurado com netlify.toml
    ```
 
 2. **Deploy Manual:**
+
    ```bash
    # Instale o Netlify CLI
    npm install -g netlify-cli
@@ -167,13 +247,16 @@ http-server . -p 3000
    - Arraste a pasta do projeto para a área de deploy
 
 #### **Vercel (Gratuito)**
+
 1. **Deploy via Git:**
+
    ```bash
    # Conecte seu repositório GitHub no Vercel
    # Deploy automático configurado com vercel.json
    ```
 
 2. **Deploy via CLI:**
+
    ```bash
    # Instale o Vercel CLI
    npm install -g vercel
@@ -184,6 +267,7 @@ http-server . -p 3000
    ```
 
 #### **Outras Opções de Hospedagem**
+
 - **Firebase Hosting**: `firebase deploy`
 - **Surge.sh**: `surge . seu-dominio.surge.sh`
 - **GitHub Codespaces**: Para desenvolvimento online
@@ -202,6 +286,7 @@ http-server . -p 3000
    - Testar responsividade (mobile/desktop)
 
 3. **Validar arquivos:**
+
    ```bash
    npm run validate
    ```
@@ -211,36 +296,43 @@ http-server . -p 3000
 ## 🧠 Estratégias Implementadas
 
 ### 1. 🔄 **Poder das Repetidas**
+
 - **Conceito**: Utiliza números que saíram no último concurso
 - **Base Estatística**: 60% dos concursos repetem ao menos 5 números
 - **Como Funciona**: Seleciona 5-7 números do último resultado + números complementares
 
 ### 2. ⚖️ **Equilíbrio Par/Ímpar**
+
 - **Conceito**: Mantém proporção ideal entre pares e ímpares
 - **Padrão**: 7 pares + 8 ímpares OU 8 pares + 7 ímpares
 - **Justificativa**: 85% dos sorteios seguem essa distribuição
 
 ### 3. ⏰ **Números Atrasados**
+
 - **Conceito**: Prioriza dezenas que estão há mais tempo sem sair
 - **Princípio**: Lei dos grandes números
 - **Método**: 60% números atrasados + 40% números normais
 
 ### 4. 🔗 **Sequências Inteligentes**
+
 - **Conceito**: Evita sequências óbvias e padrões lineares
 - **Estratégia**: Analisa padrões que raramente saem juntos
 - **Resultado**: Combinações mais naturais e menos previsíveis
 
 ### 5. 📋 **Divisão por Colunas**
+
 - **Conceito**: Distribui números pelas 5 colunas do volante
 - **Colunas**: (1-5), (6-10), (11-15), (16-20), (21-25)
 - **Benefício**: Cobertura máxima de todas as regiões
 
 ### 6. 📊 **Frequência Histórica**
+
 - **Conceito**: Combina números quentes e frios
 - **Proporção**: 50% quentes + 30% frios + 20% neutros
 - **Base**: Análise de milhares de sorteios históricos
 
 ### 7. 🔢 **Matemática dos Finais**
+
 - **Conceito**: Analisa terminações dos números (0,1,2...9)
 - **Objetivo**: Distribuição equilibrada das terminações
 - **Evita**: Concentrações incomuns de finais iguais
@@ -250,6 +342,7 @@ http-server . -p 3000
 ## 🛠️ Tecnologias Utilizadas
 
 ### Frontend
+
 - **HTML5**: Estrutura semântica moderna
 - **CSS3**: Estilos personalizados + Tailwind CSS
 - **JavaScript ES6+**: Lógica da aplicação e estratégias
@@ -257,10 +350,12 @@ http-server . -p 3000
 - **Font Awesome**: Ícones profissionais
 
 ### Bibliotecas
+
 - **Chart.js**: Para gráficos futuros de estatísticas
 - **Tailwind CSS CDN**: Design system completo
 
 ### Características Técnicas
+
 - **100% Client-Side**: Funciona offline
 - **Responsivo**: Mobile-first design
 - **Acessível**: Seguindo boas práticas de acessibilidade
@@ -270,7 +365,7 @@ http-server . -p 3000
 
 ## 📁 Estrutura do Projeto
 
-```
+```text
 lotofacil-estrategica/
 │
 ├── 📄 index.html              # Página principal
@@ -336,6 +431,7 @@ LotofacilEstrategica/          # Classe principal
 ## 🔮 Melhorias Futuras
 
 ### Versão 2.0 (Planejada)
+
 - [ ] **API da Caixa**: Busca automática dos resultados
 - [ ] **Histórico Completo**: Base de dados com todos os sorteios
 - [ ] **Gráficos Estatísticos**: Visualizações interativas
@@ -343,6 +439,7 @@ LotofacilEstrategica/          # Classe principal
 - [ ] **Sistema de Login**: Salvar jogos favoritos
 
 ### Versão 3.0 (Futuro)
+
 - [ ] **IA Preditiva**: Machine Learning para padrões
 - [ ] **App Mobile**: Versão nativa para iOS/Android
 - [ ] **Análise Social**: Comparar estratégias com outros usuários
@@ -352,11 +449,12 @@ LotofacilEstrategica/          # Classe principal
 
 ## ⚖️ Aviso Legal
 
-> **IMPORTANTE**: Este site é apenas uma ferramenta estatística e **NÃO GARANTE** resultados financeiros. 
-> 
+> **IMPORTANTE**: Este site é apenas uma ferramenta estatística e **NÃO GARANTE** resultados financeiros.
+>
 > As estratégias são baseadas em análises históricas, mas a Lotofácil continua sendo um jogo de probabilidades. Jogue com responsabilidade e apenas o valor que pode se dar ao luxo de perder.
 
 ### Responsabilidades
+
 - ✅ Ferramenta educativa e estatística
 - ✅ Código aberto e transparente  
 - ✅ Baseado em dados históricos reais
@@ -377,6 +475,7 @@ Contribuições são bem-vindas! Para contribuir:
 5. **Abra** um Pull Request
 
 ### Ideias para Contribuir
+
 - 🧠 Novas estratégias baseadas em estatísticas
 - 📊 Melhorias na interface de usuário
 - 🐛 Correções de bugs
@@ -390,7 +489,7 @@ Contribuições são bem-vindas! Para contribuir:
 Para dúvidas, sugestões ou reportar problemas:
 
 - **GitHub Issues**: [Abrir issue](https://github.com/seu-usuario/lotofacil-estrategica/issues)
-- **Email**: seu-email@exemplo.com
+- **Email**: [seu-email@exemplo.com](mailto:seu-email@exemplo.com)
 - **LinkedIn**: [Seu LinkedIn](https://linkedin.com/in/seu-perfil)
 
 ---
@@ -399,7 +498,7 @@ Para dúvidas, sugestões ou reportar problemas:
 
 Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
-```
+```text
 MIT License
 
 Copyright (c) 2024 LotoFácil Estratégica
@@ -426,12 +525,10 @@ copies or substantial portions of the Software.
 
 ---
 
-<div align="center">
+---
 
 **⭐ Se este projeto te ajudou, deixe uma estrela!**
 
-**Feito com ❤️ para a comunidade brasileira de jogadores estratégicos**
+## Feito com ❤️ para a comunidade brasileira de jogadores estratégicos
 
 [🔝 Voltar ao topo](#-lotofácil-estratégica)
-
-</div>
