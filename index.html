@@ -32,34 +32,7 @@
     <link rel="icon" type="image/png" href="assets/images/favicon.png">
     <link rel="apple-touch-icon" href="assets/images/icon-192.png">
     
-    <!-- CSS para garantir funcionamento do dropdown -->
-    <style>
-        #userDropdown {
-            position: absolute !important;
-            right: 0 !important;
-            top: 100% !important;
-            margin-top: 8px !important;
-            z-index: 9999 !important;
-            width: 16rem !important;
-            background-color: white !important;
-            border-radius: 0.5rem !important;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
-            border: 1px solid #e5e7eb !important;
-            padding: 0.5rem 0 !important;
-        }
-        
-        #userDropdown.hidden {
-            display: none !important;
-        }
-        
-        #userArea {
-            position: relative !important;
-        }
-        
-        #userMenuBtn:hover {
-            background-color: rgba(255, 255, 255, 0.3) !important;
-        }
-    </style>
+
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Cabeçalho fixo -->
@@ -77,7 +50,7 @@
                     </div>
                 </div>
 
-                <!-- Menu Desktop: Navegação → Usuário → Sair -->
+                <!-- Menu Desktop: Navegação simples -->
                 <div class="hidden md:flex items-center space-x-6">
                     <!-- Navegação -->
                     <nav class="flex items-center space-x-6">
@@ -86,71 +59,6 @@
                         <a href="#historico" class="text-white hover:text-purple-200 transition-colors">Histórico</a>
                         <a href="#rankings" class="text-white hover:text-purple-200 transition-colors">Rankings</a>
                     </nav>
-                    
-                    <!-- Menu do Usuário -->
-                    <div id="userArea" class="relative">
-                        <button id="userMenuBtn" class="flex items-center space-x-2 bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition-colors">
-                            <div class="w-8 h-8 bg-white bg-opacity-30 rounded-full flex items-center justify-center">
-                                <i class="fas fa-user text-sm"></i>
-                            </div>
-                            <div class="text-left">
-                                <p id="userName" class="text-sm font-semibold">Usuário</p>
-                                <p id="userPlan" class="text-xs text-purple-200">Plano</p>
-                            </div>
-                            <i class="fas fa-chevron-down text-xs"></i>
-                        </button>
-                        
-                        <!-- Dropdown Menu -->
-                        <div id="userDropdown" class="hidden absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50" style="position: absolute; right: 0; top: 100%; margin-top: 8px; z-index: 9999;">
-                            <!-- Info do usuário -->
-                            <div class="px-4 py-3 border-b border-gray-200">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-user text-white"></i>
-                                    </div>
-                                    <div>
-                                        <p id="dropdownUserName" class="font-semibold text-gray-800">Usuário</p>
-                                        <p id="dropdownUserPlan" class="text-sm text-gray-600">Plano</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Contador de jogos -->
-                            <div class="px-4 py-3 border-b border-gray-200">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-medium text-gray-700">Jogos hoje:</span>
-                                    <span id="contadorJogos" class="text-sm font-bold text-purple-600">0/5</span>
-                                </div>
-                                <div class="mt-2 bg-gray-200 rounded-full h-2">
-                                    <div id="progressBarJogos" class="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-                                </div>
-                            </div>
-                            
-                            <!-- Menu items -->
-                            <div class="py-1 border-t border-gray-200">
-                                <button id="perfilBtn" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
-                                    <i class="fas fa-user-cog w-4 mr-3 text-gray-400"></i>
-                                    Meu Perfil
-                                </button>
-                                
-                                <button id="planoBtn" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
-                                    <i class="fas fa-crown w-4 mr-3 text-gray-400"></i>
-                                    Gerenciar Plano
-                                </button>
-                                
-                                <button id="adminPanelBtn" class="hidden w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
-                                    <i class="fas fa-cog w-4 mr-3 text-gray-400"></i>
-                                    Painel Admin
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Botão Sair -->
-                    <button id="logoutBtn" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg text-sm transition-colors flex items-center space-x-2">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Sair</span>
-                    </button>
                 </div>
 
                 <!-- Botão menu mobile -->
@@ -181,56 +89,6 @@
                     <i class="fas fa-trophy w-6 mr-3 text-gray-400"></i>
                     Rankings
                 </a>
-                
-                <div class="border-t border-gray-200 pt-3">
-                    <!-- Info do usuário mobile -->
-                    <div id="mobileUserInfo" class="hidden bg-gray-50 rounded-lg p-3 mb-3">
-                        <div class="flex items-center space-x-3 mb-3">
-                            <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                                <i class="fas fa-user text-white"></i>
-                            </div>
-                            <div>
-                                <p id="mobileUserName" class="font-semibold text-gray-800">Usuário</p>
-                                <p id="mobileUserPlan" class="text-sm text-gray-600">Plano</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Contador de jogos mobile -->
-                        <div class="mb-3">
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm font-medium text-gray-700">Jogos hoje:</span>
-                                <span id="mobileContadorJogos" class="text-sm font-bold text-purple-600">0/5</span>
-                            </div>
-                            <div class="mt-2 bg-gray-200 rounded-full h-2">
-                                <div id="mobileProgressBarJogos" class="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Outros botões mobile -->
-                        <div class="space-y-2 border-t border-gray-200 pt-2">
-                            <button id="mobilePerfilBtn" class="w-full text-left py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg flex items-center">
-                                <i class="fas fa-user-cog w-6 mr-3 text-gray-400"></i>
-                                Meu Perfil
-                            </button>
-                            
-                            <button id="mobilePlanoBtn" class="w-full text-left py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg flex items-center">
-                                <i class="fas fa-crown w-6 mr-3 text-gray-400"></i>
-                                Gerenciar Plano
-                            </button>
-                            
-                            <button id="mobileAdminPanelBtn" class="hidden w-full text-left py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg flex items-center">
-                                <i class="fas fa-cog w-6 mr-3 text-gray-400"></i>
-                                Painel Admin
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Botão Sair Mobile -->
-                    <button id="mobileLogoutBtn" class="w-full bg-white bg-opacity-20 hover:bg-opacity-30 text-white py-2 px-3 rounded-lg flex items-center justify-center mb-3 border border-white border-opacity-30">
-                        <i class="fas fa-sign-out-alt mr-2"></i>
-                        Sair
-                    </button>
-                </div>
             </div>
         </nav>
     </div>
