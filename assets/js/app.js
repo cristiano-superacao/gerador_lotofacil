@@ -9,7 +9,7 @@ class LotofacilEstrategica {
         this.historico = [];
         this.resultadosOficiais = [];
         
-        // Definição das 7 análises estratégicas
+        // Definição das 8 análises estratégicas (todas geram 10 jogos)
         this.analises = [
             {
                 id: 1,
@@ -108,8 +108,8 @@ class LotofacilEstrategica {
         const card = document.createElement('div');
         card.className = 'bg-white rounded-lg card-shadow p-6 cursor-pointer transform transition-all duration-300 hover:scale-105';
         
-        // Definir número de jogos: 10 para estratégia 8, 7 para as outras
-        const numeroJogos = analise.id === 8 ? 10 : 7;
+        // Definir número de jogos: 10 para todas as estratégias
+        const numeroJogos = 10;
         
         card.innerHTML = `
             <div class="text-center mb-4">
@@ -1025,8 +1025,8 @@ class LotofacilEstrategica {
         const jogos = [];
         const jogosUnicos = new Set();
         
-        // Definir número de jogos: 10 para estratégia 8, 7 para as outras
-        const numeroJogos = idAnalise === 8 ? 10 : 7;
+        // Definir número de jogos: 10 para todas as estratégias
+        const numeroJogos = 10;
         
         while (jogos.length < numeroJogos) {
             let novoJogo;
