@@ -3,7 +3,7 @@
 <div align="center">
 
 ![Status](https://img.shields.io/badge/Status-Ativo-green)
-![Versão](https://img.shields.io/badge/Versão-1.0.0-blue)
+![Versão](https://img.shields.io/badge/Versão-2.0.0-blue)
 ![Licença](https://img.shields.io/badge/Licença-MIT-yellow)
 
 **Uma ferramenta de apoio para estudos e estratégias da Lotofácil — simples, confiável e prática.**
@@ -22,6 +22,15 @@ O **LotoFácil Estratégica** é um site responsivo e inteligente que aplica est
 
 Fornecer uma ferramenta baseada em análises estatísticas reais da Lotofácil, ajudando jogadores a criar jogos mais estratégicos em vez de apenas aleatórios.
 
+### 🌟 Novidades da Versão 2.0
+
+- **🆕 8ª Estratégia**: "Frequência Mensal" com dados oficiais da Caixa
+- **📊 API Real**: Integração com `servicebus2.caixa.gov.br`
+- **🎲 Mais Jogos**: Nova estratégia gera 10 jogos únicos
+- **⚡ Async/Await**: Performance aprimorada para operações assíncronas
+- **🔄 Fallback Inteligente**: Sistema de backup quando API estiver indisponível
+- **🎨 Interface Melhorada**: Nova cor teal para a estratégia especial
+
 ---
 
 ## 🚀 Demonstração
@@ -30,8 +39,8 @@ Para testar o site:
 
 1. Abra o arquivo `index.html` no seu navegador
 2. Insira o último resultado da Lotofácil (opcional)
-3. Escolha uma das 7 estratégias disponíveis
-4. Clique em "Gerar Jogos" e receba seus bilhetes otimizados
+3. Escolha uma das 8 estratégias disponíveis (nova: Frequência Mensal!)
+4. Clique em "Gerar Jogos" e receba seus bilhetes otimizados (7 ou 10 jogos)
 5. Copie, exporte ou regenere novos jogos conforme necessário
 
 ---
@@ -40,7 +49,7 @@ Para testar o site:
 
 ### ✨ Principais
 
-- **7 Estratégias Inteligentes**: Baseadas em padrões estatísticos reais
+- **8 Estratégias Inteligentes**: Baseadas em padrões estatísticos reais (nova: Frequência Mensal com API oficial!)
 - **Interface Responsiva**: Funciona perfeitamente em desktop, tablet e celular
 - **Geração Única**: Garante que os jogos nunca se repitam
 - **Integração API**: Busca dados oficiais da Caixa em tempo real
@@ -253,6 +262,17 @@ http-server . -p 3000
 - **Evita**: Concentrações incomuns de finais iguais
 - **Jogos Gerados**: 7
 
+### 8. 📅 **Frequência Mensal** ⭐ **NOVA!**
+- **Conceito**: Analisa números do mês anterior até o atual
+- **Integração**: API oficial da Caixa Econômica Federal
+- **Método**: Busca resultados recentes e calcula frequência real
+- **Algoritmo**: 60% números mais frequentes + 40% balanceamento
+- **Diferencial**: Usa dados oficiais ao invés de simulações
+- **Jogos Gerados**: 10 *(única estratégia com mais jogos)*
+- **API Endpoint**: `https://servicebus2.caixa.gov.br/portaldeloterias/api/lotofacil/`
+
+> ⭐ **DESTAQUE**: A estratégia "Frequência Mensal" é a mais avançada, sendo a única que se conecta com dados oficiais em tempo real da Caixa e gera 10 jogos únicos ao invés de 7!
+
 ---
 
 ## 🛠️ Tecnologias Utilizadas
@@ -269,10 +289,13 @@ http-server . -p 3000
 - **Tailwind CSS CDN**: Design system completo
 
 ### Características Técnicas
-- **100% Client-Side**: Funciona offline
+- **Hybrid Architecture**: Client-side + API integration
+- **Async Operations**: Operações assíncronas com async/await
 - **Responsivo**: Mobile-first design
-- **Acessível**: Seguindo boas práticas de acessibilidade
+- **Error Handling**: Tratamento robusto de erros e timeouts
+- **Fallback System**: Sistema de backup automático
 - **Performance**: Otimizado para carregamento rápido
+- **API Integration**: Conexão com dados oficiais da Caixa
 
 ---
 
@@ -282,12 +305,18 @@ http-server . -p 3000
 lotofacil-estrategica/
 │
 ├── 📄 index.html              # Página principal
-├── 📁 assets/                 # Assets organizados
+├── � README.md               # Documentação principal
+├── 📄 CHANGELOG.md            # Histórico de mudanças
+├── 📄 HISTORICO-MANUAL.md     # Manual do sistema de histórico
+├── �📁 assets/                 # Assets organizados
 │   ├── 📁 css/
 │   │   └── style.css          # Estilos customizados
 │   ├── 📁 js/
-│   │   └── app.js             # Lógica JavaScript
+│   │   └── app.js             # Lógica JavaScript (8 estratégias)
 │   └── 📁 images/             # Imagens e ícones
+│
+├── 🧪 Testes:
+│   └── teste-nova-estrategia.html  # Teste da estratégia Frequência Mensal
 │
 ├── 🔧 Configuração Web:
 │   ├── netlify.toml           # Config Netlify
@@ -358,6 +387,27 @@ LotofacilEstrategica/          # Classe principal
 
 ---
 
+## 📈 Histórico de Versões
+
+### **v2.0.0** - *25/09/2025* ⭐ **ATUAL**
+- ✨ **Nova Estratégia**: Frequência Mensal com dados oficiais da Caixa
+- 🔌 **Integração API**: Conexão com API oficial `servicebus2.caixa.gov.br`
+- 🎲 **10 Jogos Únicos**: Primeira estratégia que gera 10 jogos ao invés de 7
+- ⚡ **Async/Await**: Operações assíncronas para melhor performance
+- 🔄 **Sistema Fallback**: Backup automático quando API estiver indisponível
+- 🎨 **UI Melhorada**: Nova cor teal e loading personalizado
+- 📊 **Algoritmo Avançado**: 60% números frequentes + 40% balanceamento
+- 🛡️ **Error Handling**: Tratamento robusto de erros e timeouts
+
+### **v1.0.0** - *Versão Anterior*
+- 🎯 **7 Estratégias Base**: Implementação das estratégias fundamentais
+- 📱 **Design Responsivo**: Interface mobile-first
+- 📊 **Sistema de Histórico**: Acompanhamento de apostas e resultados
+- 🎨 **Interface Moderna**: Design clean com Tailwind CSS
+- 📈 **Dashboard**: Gráficos e estatísticas de desempenho
+
+---
+
 ## ⚖️ Aviso Legal
 
 > **IMPORTANTE**: Este site é apenas uma ferramenta estatística e **NÃO GARANTE** resultados financeiros. 
@@ -410,7 +460,7 @@ Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) par
 ```
 MIT License
 
-Copyright (c) 2024 LotoFácil Estratégica
+Copyright (c) 2024-2025 LotoFácil Estratégica
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
