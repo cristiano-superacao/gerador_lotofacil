@@ -231,6 +231,43 @@
     }
 }
 
+/* Grid responsivo para cards de análise */
+@media (min-width: 1280px) {
+    .xl\:grid-cols-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+/* Efeitos especiais para estratégias */
+.frequencia-mensal {
+    background: linear-gradient(135deg, #0D9488 0%, #06B6D4 100%);
+    animation: pulse-teal 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-teal {
+    0% {
+        box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.4);
+    }
+    100% {
+        box-shadow: 0 0 0 10px rgba(13, 148, 136, 0);
+    }
+}
+
+.frequencia-mensal:hover {
+    animation: none;
+    transform: translateY(-4px) scale(1.05);
+}
+
+/* Indicador visual para estratégias que usam dados reais */
+.dados-reais::after {
+    content: '🔥';
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 20px;
+    z-index: 10;
+}
+
 /* Estados de foco melhorados para acessibilidade */
 button:focus,
 input:focus,
@@ -326,4 +363,372 @@ select:focus {
         background: white !important;
         color: black !important;
     }
+}
+
+/* Estilos específicos para histórico e performance */
+
+/* Cards de histórico */
+.historico-card {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.historico-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.historico-card.premiado::before {
+    content: '🏆';
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 24px;
+    z-index: 10;
+}
+
+/* Estatísticas responsivas */
+.stats-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+}
+
+/* Botões de ação responsivos */
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+@media (max-width: 640px) {
+    .action-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .action-buttons button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Filtros responsivos */
+.filters-container {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+@media (max-width: 768px) {
+    .filters-container {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+}
+
+/* Cards de aposta responsivos */
+.aposta-card {
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+.aposta-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Grid de acertos responsivo */
+.acertos-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .acertos-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .acertos-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.25rem;
+    }
+}
+
+/* Números das apostas responsivos */
+.numeros-aposta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.125rem;
+    justify-content: center;
+}
+
+@media (max-width: 480px) {
+    .numeros-aposta .number-ball {
+        width: 32px;
+        height: 32px;
+        font-size: 11px;
+        margin: 1px;
+    }
+}
+
+/* Modal responsivo */
+.modal-historico {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+    .modal-historico {
+        margin: 1rem;
+        max-width: calc(100vw - 2rem);
+        max-height: calc(100vh - 2rem);
+    }
+}
+
+/* Gráficos responsivos */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .chart-container {
+        height: 250px;
+    }
+}
+
+@media (max-width: 480px) {
+    .chart-container {
+        height: 200px;
+    }
+}
+
+/* Tabela de estatísticas responsiva */
+.stats-table {
+    overflow-x: auto;
+}
+
+.stats-table table {
+    min-width: 100%;
+    border-collapse: collapse;
+}
+
+@media (max-width: 640px) {
+    .stats-table {
+        font-size: 0.875rem;
+    }
+}
+
+/* Loading específico para histórico */
+.loading-historico {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: #6B7280;
+}
+
+.loading-historico .spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid #E5E7EB;
+    border-top-color: #6366F1;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 0.75rem;
+}
+
+/* Estados vazios */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #9CA3AF;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* Indicadores de status */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-pendente {
+    background-color: #FEF3C7;
+    color: #D97706;
+}
+
+.status-conferido {
+    background-color: #F3F4F6;
+    color: #6B7280;
+}
+
+.status-premiado {
+    background-color: #D1FAE5;
+    color: #10B981;
+}
+
+/* Animações específicas do histórico */
+.fade-in-up {
+    animation: fadeInUp 0.5s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.bounce-in {
+    animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Destacar premiações */
+.premio-highlight {
+    background: linear-gradient(135deg, #10B981, #34D399);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* Melhorias na navegação mobile */
+@media (max-width: 768px) {
+    .nav-mobile {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #E5E7EB;
+        padding: 0.75rem;
+        display: flex;
+        justify-content: space-around;
+        z-index: 40;
+    }
+    
+    .nav-mobile a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0.5rem;
+        text-decoration: none;
+        color: #6B7280;
+        font-size: 0.75rem;
+        transition: color 0.2s;
+    }
+    
+    .nav-mobile a:hover,
+    .nav-mobile a.active {
+        color: #6366F1;
+    }
+    
+    .nav-mobile i {
+        font-size: 1.25rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    /* Adicionar espaço no final da página para navegação mobile */
+    body {
+        padding-bottom: 80px;
+    }
+}
+
+/* Otimizações para impressão do histórico */
+@media print {
+    .historico-card {
+        break-inside: avoid;
+        margin-bottom: 1rem;
+    }
+    
+    .action-buttons {
+        display: none;
+    }
+    
+    .filters-container {
+        display: none;
+    }
+    
+    .chart-container {
+        display: none;
+    }
+}
+
+/* Acessibilidade melhorada */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Focus states melhorados */
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+    outline: 2px solid #6366F1;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Transições suaves para todos os elementos do histórico */
+.historico-section * {
+    transition: all 0.2s ease;
 }

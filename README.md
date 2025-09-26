@@ -16,7 +16,7 @@
 
 ## 📖 Sobre o Projeto
 
-O **LotoFácil Estratégica** é um site responsivo e inteligente que aplica estatísticas conhecidas da Lotofácil para gerar 7 bilhetes otimizados e únicos em cada análise. O usuário escolhe a estratégia desejada, clica em um botão e recebe os jogos prontos para usar.
+O **LotoFácil Estratégica** é um site responsivo e inteligente que aplica estatísticas conhecidas da Lotofácil para gerar jogos otimizados e únicos em cada análise. O usuário escolhe a estratégia desejada, clica em um botão e recebe os jogos prontos para usar.
 
 ### 🎯 Objetivo
 
@@ -31,7 +31,7 @@ Para testar o site:
 1. Abra o arquivo `index.html` no seu navegador
 2. Insira o último resultado da Lotofácil (opcional)
 3. Escolha uma das 7 estratégias disponíveis
-4. Clique em "Gerar 7 Jogos" e receba seus bilhetes otimizados
+4. Clique em "Gerar Jogos" e receba seus bilhetes otimizados
 5. Copie, exporte ou regenere novos jogos conforme necessário
 
 ---
@@ -42,8 +42,9 @@ Para testar o site:
 
 - **7 Estratégias Inteligentes**: Baseadas em padrões estatísticos reais
 - **Interface Responsiva**: Funciona perfeitamente em desktop, tablet e celular
-- **Geração Única**: Garante que os 7 jogos nunca se repitam
-- **Últimos Resultados**: Área para inserir o resultado mais recente
+- **Geração Única**: Garante que os jogos nunca se repitam
+- **Integração API**: Busca dados oficiais da Caixa em tempo real
+- **Histórico Completo**: Acompanhe seus acertos e performance
 - **Design Moderno**: Interface clean e profissional
 
 ### 🛠️ Ferramentas
@@ -214,36 +215,43 @@ http-server . -p 3000
 - **Conceito**: Utiliza números que saíram no último concurso
 - **Base Estatística**: 60% dos concursos repetem ao menos 5 números
 - **Como Funciona**: Seleciona 5-7 números do último resultado + números complementares
+- **Jogos Gerados**: 7
 
 ### 2. ⚖️ **Equilíbrio Par/Ímpar**
 - **Conceito**: Mantém proporção ideal entre pares e ímpares
 - **Padrão**: 7 pares + 8 ímpares OU 8 pares + 7 ímpares
 - **Justificativa**: 85% dos sorteios seguem essa distribuição
+- **Jogos Gerados**: 7
 
 ### 3. ⏰ **Números Atrasados**
 - **Conceito**: Prioriza dezenas que estão há mais tempo sem sair
 - **Princípio**: Lei dos grandes números
 - **Método**: 60% números atrasados + 40% números normais
+- **Jogos Gerados**: 7
 
 ### 4. 🔗 **Sequências Inteligentes**
 - **Conceito**: Evita sequências óbvias e padrões lineares
 - **Estratégia**: Analisa padrões que raramente saem juntos
 - **Resultado**: Combinações mais naturais e menos previsíveis
+- **Jogos Gerados**: 7
 
 ### 5. 📋 **Divisão por Colunas**
 - **Conceito**: Distribui números pelas 5 colunas do volante
 - **Colunas**: (1-5), (6-10), (11-15), (16-20), (21-25)
 - **Benefício**: Cobertura máxima de todas as regiões
+- **Jogos Gerados**: 7
 
 ### 6. 📊 **Frequência Histórica**
 - **Conceito**: Combina números quentes e frios
 - **Proporção**: 50% quentes + 30% frios + 20% neutros
 - **Base**: Análise de milhares de sorteios históricos
+- **Jogos Gerados**: 7
 
 ### 7. 🔢 **Matemática dos Finais**
 - **Conceito**: Analisa terminações dos números (0,1,2...9)
 - **Objetivo**: Distribuição equilibrada das terminações
 - **Evita**: Concentrações incomuns de finais iguais
+- **Jogos Gerados**: 7
 
 ---
 

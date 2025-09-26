@@ -43,6 +43,8 @@
                 <nav class="hidden md:flex space-x-6">
                     <a href="#inicio" class="hover:text-purple-200 transition-colors">Início</a>
                     <a href="#analises" class="hover:text-purple-200 transition-colors">Análises</a>
+                    <a href="#historico" class="hover:text-purple-200 transition-colors">Histórico</a>
+                    <a href="#performance" class="hover:text-purple-200 transition-colors">Performance</a>
                     <a href="#sobre" class="hover:text-purple-200 transition-colors">Sobre</a>
                 </nav>
             </div>
@@ -114,10 +116,10 @@
         <section id="analises" class="mb-12">
             <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Estratégias Inteligentes</h2>
             <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-                Escolha uma das nossas análises baseadas em padrões estatísticos da Lotofácil. Cada estratégia gera 7 jogos únicos e otimizados.
+                Escolha uma das nossas análises baseadas em padrões estatísticos da Lotofácil. Cada estratégia gera jogos únicos e otimizados.
             </p>
             
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="cardsAnalises">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="cardsAnalises">
                 <!-- Os cards serão inseridos aqui via JavaScript -->
             </div>
         </section>
@@ -131,7 +133,7 @@
                         <h3 id="estrategiaUsada" class="text-xl font-bold text-gray-800">-</h3>
                         <p class="text-gray-600">7 jogos únicos gerados</p>
                     </div>
-                    <div class="flex space-x-2">
+                    <div class="flex flex-wrap gap-2">
                         <button id="copiarJogos" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
                             <i class="fas fa-copy mr-2"></i>
                             Copiar
@@ -139,6 +141,10 @@
                         <button id="exportarJogos" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
                             <i class="fas fa-download mr-2"></i>
                             Exportar
+                        </button>
+                        <button id="salvarJogosHistorico" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-save mr-2"></i>
+                            Salvar no Histórico
                         </button>
                     </div>
                 </div>
@@ -152,6 +158,149 @@
                         <i class="fas fa-redo mr-2"></i>
                         Gerar Novos Jogos
                     </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção histórico de apostas -->
+        <section id="historico" class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">
+                <i class="fas fa-history text-indigo-600 mr-3"></i>
+                Histórico de Apostas
+            </h2>
+            
+            <!-- Estatísticas gerais -->
+            <div class="grid md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg card-shadow p-6 text-center">
+                    <div class="text-3xl font-bold text-blue-600" id="totalApostas">0</div>
+                    <div class="text-gray-600 text-sm">Total de Apostas</div>
+                </div>
+                <div class="bg-white rounded-lg card-shadow p-6 text-center">
+                    <div class="text-3xl font-bold text-green-600" id="totalGanhos">R$ 0,00</div>
+                    <div class="text-gray-600 text-sm">Total em Ganhos</div>
+                </div>
+                <div class="bg-white rounded-lg card-shadow p-6 text-center">
+                    <div class="text-3xl font-bold text-red-600" id="totalPerdas">R$ 0,00</div>
+                    <div class="text-gray-600 text-sm">Total Investido</div>
+                </div>
+                <div class="bg-white rounded-lg card-shadow p-6 text-center">
+                    <div class="text-3xl font-bold" id="saldoGeral">R$ 0,00</div>
+                    <div class="text-gray-600 text-sm">Saldo Geral</div>
+                </div>
+            </div>
+
+            <!-- Controles do histórico -->
+            <div class="bg-white rounded-lg card-shadow p-6 mb-6">
+                <div class="flex flex-wrap items-center justify-between mb-4 gap-4">
+                    <h3 class="text-xl font-bold text-gray-800">Gerenciar Histórico</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <button id="atualizarResultados" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-sync-alt mr-2"></i>
+                            Atualizar Resultados
+                        </button>
+                        <button id="exportarHistorico" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-file-export mr-2"></i>
+                            Exportar Dados
+                        </button>
+                        <button id="limparHistorico" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-trash mr-2"></i>
+                            Limpar Histórico
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Filtros -->
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600 mb-2">Período</label>
+                        <select id="filtroPeriodo" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <option value="todos">Todos os períodos</option>
+                            <option value="30">Últimos 30 dias</option>
+                            <option value="90">Últimos 3 meses</option>
+                            <option value="365">Último ano</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600 mb-2">Estratégia</label>
+                        <select id="filtroEstrategia" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <option value="todas">Todas as estratégias</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600 mb-2">Status</label>
+                        <select id="filtroStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <option value="todos">Todos os status</option>
+                            <option value="pendente">Aguardando resultado</option>
+                            <option value="conferido">Já conferido</option>
+                            <option value="premiado">Premiado</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de apostas -->
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">Minhas Apostas</h3>
+                <div id="listaApostas" class="space-y-4">
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fas fa-history text-4xl mb-4 opacity-50"></i>
+                        <p>Nenhuma aposta no histórico ainda.</p>
+                        <p class="text-sm">Gere alguns jogos e salve-os no histórico para acompanhar seus resultados!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção análise de performance -->
+        <section id="performance" class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">
+                <i class="fas fa-chart-line text-green-600 mr-3"></i>
+                Análise de Performance
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Gráfico de acertos -->
+                <div class="bg-white rounded-lg card-shadow p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Distribuição de Acertos</h3>
+                    <canvas id="graficoAcertos" width="400" height="200"></canvas>
+                </div>
+                
+                <!-- Gráfico financeiro -->
+                <div class="bg-white rounded-lg card-shadow p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Performance Financeira</h3>
+                    <canvas id="graficoFinanceiro" width="400" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- Estatísticas detalhadas -->
+            <div class="bg-white rounded-lg card-shadow p-6 mt-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">Estatísticas Detalhadas</h3>
+                <div class="grid md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-gray-800" id="acertos11">0</div>
+                        <div class="text-sm text-gray-600">11 Acertos</div>
+                        <div class="text-xs text-green-600" id="premios11">R$ 0,00</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-gray-800" id="acertos12">0</div>
+                        <div class="text-sm text-gray-600">12 Acertos</div>
+                        <div class="text-xs text-green-600" id="premios12">R$ 0,00</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-gray-800" id="acertos13">0</div>
+                        <div class="text-sm text-gray-600">13 Acertos</div>
+                        <div class="text-xs text-green-600" id="premios13">R$ 0,00</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-gray-800" id="acertos14">0</div>
+                        <div class="text-sm text-gray-600">14 Acertos</div>
+                        <div class="text-xs text-green-600" id="premios14">R$ 0,00</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-gray-800" id="acertos15">0</div>
+                        <div class="text-sm text-gray-600">15 Acertos</div>
+                        <div class="text-xs text-green-600" id="premios15">R$ 0,00</div>
+                    </div>
                 </div>
             </div>
         </section>
