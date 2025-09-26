@@ -360,7 +360,7 @@ class LotofacilEstrategica {
         }
         
         const estrategiaUsada = document.getElementById('estrategiaUsada').textContent;
-        const valorAposta = this.jogosGerados.length * 3; // R$ 3,00 por jogo
+        const valorAposta = this.jogosGerados.length * 3.5; // R$ 3,50 por jogo
         
         const novoRegistro = {
             id: Date.now(),
@@ -468,13 +468,13 @@ class LotofacilEstrategica {
     }
     
     calcularPremio(acertos) {
-        // Valores aproximados da Lotofácil (podem variar)
+        // Valores oficiais da Lotofácil (atualizados em setembro/2025)
         const tabelaPremios = {
-            15: 1500000, // 15 acertos
-            14: 1500,    // 14 acertos  
-            13: 30,      // 13 acertos
-            12: 12,      // 12 acertos
-            11: 6        // 11 acertos
+            15: 1500000, // 15 acertos (valor estimado/variável)
+            14: 2354,    // 14 acertos (valor estimado/variável)
+            13: 35,      // 13 acertos (valor fixo)
+            12: 14,      // 12 acertos (valor fixo)
+            11: 7        // 11 acertos (valor fixo)
         };
         
         return tabelaPremios[acertos] || 0;
