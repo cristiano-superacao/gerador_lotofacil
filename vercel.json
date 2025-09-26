@@ -1,6 +1,11 @@
 {
   "version": 2,
   "name": "lotofacil-estrategica",
+  "functions": {
+    "pages/**": {
+      "runtime": "nodejs20.x"
+    }
+  },
   "builds": [
     {
       "src": "index.html",

@@ -40,8 +40,8 @@
     "url": "https://github.com/seu-usuario/lotofacil-estrategica/issues"
   },
   "engines": {
-    "node": ">=14.0.0",
-    "npm": ">=6.0.0"
+    "node": "20.x",
+    "npm": ">=10.0.0"
   },
   "browserslist": [
     "defaults",

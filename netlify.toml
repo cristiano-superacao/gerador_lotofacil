@@ -11,6 +11,11 @@
   # Default build command
   command = ""
 
+# Environment variables
+[build.environment]
+  NODE_VERSION = "20.11.0"
+  NPM_VERSION = "10.2.4"
+
 # Production context: all deploys from the Production branch set in your site's
 # deploy settings will inherit these settings.
 [context.production]
