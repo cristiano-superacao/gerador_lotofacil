@@ -1109,17 +1109,25 @@ class LotofacilEstrategica {
     conferirAposta(id) {
         const registro = this.historico.find(r => r.id === id);
         if (!registro) return;
-        
+
         if (!this.ultimoResultado) {
             this.mostrarAlerta('É necessário ter um resultado oficial para conferir', 'warning');
             return;
         }
-        
+
+        // Bloqueio: só permite conferir se a data da aposta for igual ou anterior ao último resultado oficial
+        const dataAposta = new Date(registro.data);
+        const dataUltimoResultado = new Date(this.ultimoResultado.data.split('/').reverse().join('-'));
+        if (dataAposta > dataUltimoResultado) {
+            this.mostrarAlerta('Aguarde o resultado oficial da Caixa para esta data antes de conferir esta aposta.', 'info');
+            return;
+        }
+
         this.conferirApostasDoRegistro(registro, this.ultimoResultado);
         this.salvarHistorico();
         this.exibirHistorico();
         this.atualizarEstatisticas();
-        
+
         if (registro.totalPremio > 0) {
             this.mostrarAlerta(`Parabéns! Você ganhou R$ ${registro.totalPremio.toFixed(2)}!`, 'success');
         } else {
