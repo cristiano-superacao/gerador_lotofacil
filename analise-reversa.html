@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise Reversa - LotoFácil Estratégica</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'lotofacil': {
+                            'green': '#00A651',
+                            'green-dark': '#008F47',
+                            'yellow': '#FFD100',
+                            'blue': '#0066CC',
+                            'gray': '#6B7280'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Estilos customizados -->
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-lotofacil-green to-lotofacil-green-dark text-white shadow-xl sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo e título -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-chart-line text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold">Análise Reversa</h1>
+                        <p class="text-green-200 text-sm">Comparativo de estratégias</p>
+                    </div>
+                </div>
+
+                <!-- Navegação -->
+                <nav class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="hover:text-green-200 transition-colors font-medium">
+                        <i class="fas fa-home mr-2"></i>Início
+                    </a>
+                    <a href="#analises" class="hover:text-green-200 transition-colors font-medium">Análises</a>
+                    <a href="#historico" class="hover:text-green-200 transition-colors font-medium">Histórico</a>
+                </nav>
+
+                <!-- Menu Mobile -->
+                <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg hover:bg-white/10 transition-colors">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Hero Section -->
+        <section class="text-center mb-12">
+            <div class="max-w-4xl mx-auto">
+                <div class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-r from-purple-500 to-blue-600 rounded-full mb-8 shadow-xl">
+                    <i class="fas fa-analytics text-white text-4xl"></i>
+                </div>
+                <h1 class="text-4xl md:text-6xl font-bold text-gray-800 mb-6">
+                    Análise <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-blue-600">Reversa</span>
+                </h1>
+                <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+                    Compare resultados oficiais com nossas estratégias e descubra qual método está sendo mais assertivo.
+                </p>
+            </div>
+        </section>
+
+        <!-- Seção de Input de Resultados -->
+        <section id="input-resultados" class="mb-16">
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-plus-circle text-lotofacil-green mr-3"></i>
+                    Adicionar Resultado Oficial
+                </h2>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Concurso</label>
+                        <input type="number" id="novoConcurso" placeholder="Ex: 3185" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Data do Sorteio</label>
+                        <input type="date" id="novaData" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Dezenas Sorteadas (15 números)</label>
+                    <input type="text" id="novasDezenas" placeholder="Ex: 01,02,03,04,05,06,07,08,09,10,11,12,13,14,15" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                
+                <div class="mt-6 flex gap-4">
+                    <button onclick="adicionarResultado()" 
+                            class="bg-gradient-to-r from-lotofacil-green to-lotofacil-green-dark text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
+                        <i class="fas fa-save mr-2"></i>Salvar Resultado
+                    </button>
+                    <button onclick="buscarResultadoOficial()" 
+                            class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
+                        <i class="fas fa-download mr-2"></i>Buscar da API
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard de Análises -->
+        <section id="dashboard" class="mb-16">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">
+                <i class="fas fa-chart-bar text-purple-600 mr-3"></i>
+                Dashboard de Performance
+            </h2>
+            
+            <!-- Cards de Estatísticas -->
+            <div class="grid md:grid-cols-4 gap-6 mb-12">
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-blue-600" id="totalResultados">0</div>
+                    <div class="text-gray-600 text-sm">Resultados Analisados</div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-green-600" id="melhorEstrategia">-</div>
+                    <div class="text-gray-600 text-sm">Melhor Estratégia</div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-purple-600" id="mediaAcertos">0</div>
+                    <div class="text-gray-600 text-sm">Média de Acertos</div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-orange-600" id="numeroMaisFrequente">-</div>
+                    <div class="text-gray-600 text-sm">Número Mais Frequente</div>
+                </div>
+            </div>
+
+            <!-- Gráficos -->
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Gráfico de Performance por Estratégia -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Performance por Estratégia</h3>
+                    <canvas id="graficoEstrategias" width="400" height="300"></canvas>
+                </div>
+                
+                <!-- Gráfico de Frequência de Números -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Frequência dos Números</h3>
+                    <canvas id="graficoFrequencia" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tabela de Resultados Detalhados -->
+        <section id="tabela-resultados" class="mb-16">
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">
+                        <i class="fas fa-table text-purple-600 mr-3"></i>
+                        Análise Detalhada por Resultado
+                    </h2>
+                    <div class="flex gap-4">
+                        <button onclick="exportarAnalises()" 
+                                class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-file-excel mr-2"></i>Exportar
+                        </button>
+                        <button onclick="limparAnalises()" 
+                                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-trash mr-2"></i>Limpar Dados
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Concurso</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Data</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Melhor Estratégia</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Acertos</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Análise</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaCorpo" class="divide-y divide-gray-200">
+                            <!-- Dados serão inseridos via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Insights -->
+        <section id="insights" class="mb-16">
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-lightbulb text-yellow-500 mr-3"></i>
+                    Insights e Recomendações
+                </h2>
+                <div id="listaInsights" class="space-y-4">
+                    <!-- Insights serão gerados dinamicamente -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Loading overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-8 text-center">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+            <p class="text-gray-600">Processando análise...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/analise-reversa.js"></script>
+</body>
+</html>
