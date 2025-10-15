@@ -1101,7 +1101,7 @@ class LotofacilEstrategica {
         }
     }
     
-    mostrarLoading(mostrar, mensagem = 'Carregando...') {
+    mostrarDetalhes(idAnalise) {
         const analise = this.analises.find(a => a.id === idAnalise);
         if (!analise) return;
         
@@ -1537,8 +1537,29 @@ class LotofacilEstrategica {
         return jogo.sort((a, b) => a - b);
     }
     
-    // Estratégia 8: Sistema Avançado Completo
+    // Estratégia 8: Sistema Avançado Completo com Fallback Inteligente
     async estrategiaFrequenciaMensal() {
+        try {
+            // Tentar buscar dados oficiais primeiro
+            const resultadosRecentes = await this.buscarResultadosRecentes();
+            
+            if (resultadosRecentes && resultadosRecentes.length > 0) {
+                // Usar dados reais da API
+                const frequencia = this.calcularFrequenciaNumeros(resultadosRecentes);
+                const jogoComDadosReais = this.gerarJogoComFrequencia(frequencia);
+                console.log('Usando dados oficiais da API para estratégia 8');
+                return jogoComDadosReais;
+            } else {
+                throw new Error('API indisponível');
+            }
+        } catch (error) {
+            console.warn('Usando fallback para estratégia 8:', error.message);
+            // Fallback: usar números de referência + sistema avançado
+            return this.estrategiaFrequenciaMensalFallback();
+        }
+    }
+    
+    estrategiaFrequenciaMensalFallback() {
         const jogo = [];
         
         // 1. Incluir TODOS os 9 números de referência (base sólida)
@@ -1792,17 +1813,40 @@ class LotofacilEstrategica {
     
     async buscarResultadosRecentes() {
         try {
+            // Cache simples para evitar chamadas excessivas
+            const cacheKey = 'resultados_recentes_cache';
+            const cacheTime = 'resultados_recentes_time';
+            const cacheValidity = 30 * 60 * 1000; // 30 minutos
+            
+            const cached = localStorage.getItem(cacheKey);
+            const cacheTimestamp = localStorage.getItem(cacheTime);
+            
+            if (cached && cacheTimestamp) {
+                const isValid = Date.now() - parseInt(cacheTimestamp) < cacheValidity;
+                if (isValid) {
+                    console.log('Usando dados em cache');
+                    return JSON.parse(cached);
+                }
+            }
+            
             // Buscar últimos resultados da API da Caixa
-            const response = await fetch('https://servicebus2.caixa.gov.br/portaldeloterias/api/lotofacil/');
+            const response = await fetch('https://servicebus2.caixa.gov.br/portaldeloterias/api/lotofacil/', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Cache-Control': 'no-cache'
+                },
+                timeout: 10000 // 10 segundos timeout
+            });
             
             if (!response.ok) {
-                throw new Error('Erro na API');
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             
             const ultimoResultado = await response.json();
             
-            if (!ultimoResultado || !ultimoResultado.numero) {
-                throw new Error('Dados inválidos');
+            if (!ultimoResultado || !ultimoResultado.numero || !ultimoResultado.listaDezenas) {
+                throw new Error('Dados incompletos recebidos da API');
             }
             
             // Para esta implementação, vamos simular buscar múltiplos concursos
@@ -1818,7 +1862,7 @@ class LotofacilEstrategica {
                     // Usar o resultado real mais recente
                     resultados.push({
                         concurso: concursoAtual,
-                        dezenas: ultimoResultado.listaDezenas,
+                        dezenas: ultimoResultado.listaDezenas.map(n => parseInt(n)),
                         data: ultimoResultado.dataApuracao
                     });
                 } else {
@@ -1837,13 +1881,28 @@ class LotofacilEstrategica {
             const mesPassado = new Date();
             mesPassado.setMonth(mesPassado.getMonth() - 1);
             
-            return resultados.filter(resultado => {
+            const resultadosFiltrados = resultados.filter(resultado => {
                 const dataResultado = new Date(resultado.data);
                 return dataResultado >= mesPassado && dataResultado <= agora;
             });
             
+            // Salvar no cache
+            localStorage.setItem(cacheKey, JSON.stringify(resultadosFiltrados));
+            localStorage.setItem(cacheTime, Date.now().toString());
+            
+            console.log('Dados atualizados da API oficial');
+            return resultadosFiltrados;
+            
         } catch (error) {
             console.warn('Erro ao buscar resultados recentes:', error);
+            
+            // Tentar usar cache expirado como fallback
+            const cached = localStorage.getItem('resultados_recentes_cache');
+            if (cached) {
+                console.log('Usando cache expirado como fallback');
+                return JSON.parse(cached);
+            }
+            
             return null;
         }
     }

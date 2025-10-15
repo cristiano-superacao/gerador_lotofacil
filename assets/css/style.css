@@ -229,6 +229,82 @@
     .card-shadow:hover {
         transform: translateY(-4px) scale(1.01);
     }
+    
+    /* Melhorar layout dos jogos em mobile */
+    .numeros-aposta {
+        gap: 0.125rem;
+        justify-content: flex-start;
+    }
+    
+    /* Ajustar espaçamento dos cards */
+    .grid {
+        gap: 1rem;
+    }
+    
+    /* Melhorar botões de ação */
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .action-buttons button {
+        width: 100%;
+        justify-content: center;
+        min-height: 44px; /* Mínimo para touch */
+    }
+}
+
+/* Melhorias para tablets */
+@media (max-width: 768px) and (min-width: 641px) {
+    .number-ball {
+        width: 38px;
+        height: 38px;
+        font-size: 13px;
+    }
+    
+    .grid {
+        gap: 1.25rem;
+    }
+}
+
+/* Otimizações para telas muito pequenas */
+@media (max-width: 480px) {
+    .container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+    
+    .number-ball {
+        width: 32px;
+        height: 32px;
+        font-size: 11px;
+        margin: 1px;
+    }
+    
+    .modal-historico {
+        margin: 0.5rem;
+        max-width: calc(100vw - 1rem);
+        max-height: calc(100vh - 1rem);
+    }
+    
+    /* Melhorar layout do cabeçalho */
+    header .container {
+        padding: 0.75rem;
+    }
+    
+    header h1 {
+        font-size: 1.25rem;
+    }
+    
+    header p {
+        font-size: 0.75rem;
+    }
+    
+    /* Ajustar cards de análise */
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
 }
 
 /* Grid responsivo para cards de análise */
