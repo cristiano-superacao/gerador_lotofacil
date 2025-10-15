@@ -88,8 +88,61 @@ class LotofacilEstrategica {
         this.definirDataAtual();
         this.carregarHistorico();
         this.atualizarEstatisticas();
+        this.recuperarUltimoResultado();
         this.buscarUltimoResultadoAutomatico();
         this.inicializarNumerosReferencia();
+        this.inicializarServiceWorker();
+    }
+    
+    recuperarUltimoResultado() {
+        try {
+            const ultimoSalvo = localStorage.getItem('ultimo_resultado_manual');
+            if (ultimoSalvo) {
+                this.ultimoResultado = JSON.parse(ultimoSalvo);
+                this.preencherFormularioUltimoResultado();
+                this.exibirUltimoResultado();
+                console.log('Último resultado recuperado do cache');
+            }
+        } catch (error) {
+            console.warn('Erro ao recuperar último resultado:', error);
+        }
+    }
+    
+    preencherFormularioUltimoResultado() {
+        if (!this.ultimoResultado) return;
+        
+        document.getElementById('concurso').value = this.ultimoResultado.concurso;
+        const dataFormatada = this.ultimoResultado.data.split('/').reverse().join('-');
+        document.getElementById('dataConcurso').value = dataFormatada;
+        document.getElementById('dezenasUltimoResultado').value = this.ultimoResultado.dezenas.join(',');
+    }
+    
+    async inicializarServiceWorker() {
+        if ('serviceWorker' in navigator) {
+            try {
+                const registration = await navigator.serviceWorker.register('/sw.js');
+                console.log('Service Worker registrado com sucesso:', registration);
+                
+                // Verificar se há atualizações
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            // Nova versão disponível
+                            this.mostrarAlerta('Nova versão disponível! Recarregue a página para atualizar.', 'info');
+                        }
+                    });
+                });
+                
+                // Verificar se já há um service worker ativo
+                if (registration.waiting) {
+                    this.mostrarAlerta('Nova versão disponível! Recarregue a página para atualizar.', 'info');
+                }
+                
+            } catch (error) {
+                console.warn('Service Worker registration failed:', error);
+            }
+        }
     }
     
     // === NOVA FUNCIONALIDADE: NÚMEROS DE REFERÊNCIA ===
@@ -346,48 +399,69 @@ class LotofacilEstrategica {
     }
     
     salvarUltimoResultado() {
-        const concurso = document.getElementById('concurso').value;
+        const concurso = document.getElementById('concurso').value.trim();
         const data = document.getElementById('dataConcurso').value;
-        const dezenas = document.getElementById('dezenasUltimoResultado').value;
+        const dezenas = document.getElementById('dezenasUltimoResultado').value.trim();
         
+        // Validação de campos obrigatórios
         if (!concurso || !data || !dezenas) {
             this.mostrarAlerta('Por favor, preencha todos os campos!', 'warning');
             return;
         }
         
-        // Validar e processar dezenas
-        const dezenasList = dezenas.split(',').map(n => n.trim().padStart(2, '0'));
+        // Validar concurso
+        const numConcurso = parseInt(concurso);
+        if (isNaN(numConcurso) || numConcurso < 1 || numConcurso > 99999) {
+            this.mostrarAlerta('Número do concurso deve estar entre 1 e 99999!', 'error');
+            return;
+        }
         
-        if (dezenasList.length !== 15) {
+        // Validar e processar dezenas
+        const dezenasArray = dezenas.split(',').map(n => n.trim()).filter(n => n !== '');
+        
+        if (dezenasArray.length !== 15) {
             this.mostrarAlerta('Você deve informar exatamente 15 dezenas!', 'error');
             return;
         }
         
-        // Validar se todas são números válidos da Lotofácil
-        const numerosValidos = dezenasList.every(n => {
-            const num = parseInt(n);
-            return num >= 1 && num <= 25 && !isNaN(num);
-        });
-        
-        if (!numerosValidos) {
-            this.mostrarAlerta('Todas as dezenas devem estar entre 01 e 25!', 'error');
-            return;
+        // Validar cada dezena
+        const dezenasProcessadas = [];
+        for (let dezena of dezenasArray) {
+            // Remover zeros à esquerda e validar
+            const num = parseInt(dezena);
+            if (isNaN(num) || num < 1 || num > 25) {
+                this.mostrarAlerta(`Dezena "${dezena}" é inválida! Use números de 01 a 25.`, 'error');
+                return;
+            }
+            const dezenaFormatada = num.toString().padStart(2, '0');
+            dezenasProcessadas.push(dezenaFormatada);
         }
         
         // Verificar duplicatas
-        if (new Set(dezenasList).size !== 15) {
+        const dezenasUnicas = new Set(dezenasProcessadas);
+        if (dezenasUnicas.size !== 15) {
             this.mostrarAlerta('Não pode haver dezenas repetidas!', 'error');
             return;
         }
         
+        // Validar data
+        const dataObj = new Date(data);
+        const hoje = new Date();
+        if (dataObj > hoje) {
+            this.mostrarAlerta('A data não pode ser futura!', 'warning');
+        }
+        
         this.ultimoResultado = {
-            concurso: parseInt(concurso),
-            data: new Date(data).toLocaleDateString('pt-BR'),
-            dezenas: dezenasList.sort((a, b) => parseInt(a) - parseInt(b))
+            concurso: numConcurso,
+            data: dataObj.toLocaleDateString('pt-BR'),
+            dezenas: dezenasProcessadas.sort((a, b) => parseInt(a) - parseInt(b))
         };
         
         this.exibirUltimoResultado();
         this.mostrarAlerta('Último resultado salvo com sucesso!', 'success');
+        
+        // Salvar no localStorage para recuperação
+        localStorage.setItem('ultimo_resultado_manual', JSON.stringify(this.ultimoResultado));
     }
     
     exibirUltimoResultado() {
@@ -416,44 +490,67 @@ class LotofacilEstrategica {
     // === FUNÇÕES DE INTEGRAÇÃO COM API DA CAIXA ===
     
     async buscarUltimoResultadoAutomatico() {
-        try {
-            this.mostrarLoading(true, 'Buscando último resultado da Caixa...');
-            
-            // Usando API alternativa para obter resultados da Lotofácil
-            const response = await fetch('https://servicebus2.caixa.gov.br/portaldeloterias/api/lotofacil/');
-            
-            if (!response.ok) {
-                throw new Error('Erro ao buscar dados da API');
-            }
-            
-            const data = await response.json();
-            
-            if (data && data.listaDezenas && data.numero && data.dataApuracao) {
-                // Processar dados da API oficial
-                this.ultimoResultado = {
-                    concurso: parseInt(data.numero),
-                    data: this.formatarDataBrasil(data.dataApuracao),
-                    dezenas: data.listaDezenas.map(n => n.toString().padStart(2, '0')).sort((a, b) => parseInt(a) - parseInt(b))
-                };
+        const maxRetries = 3;
+        let lastError;
+        
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                this.mostrarLoading(true, attempt === 1 ? 'Buscando último resultado da Caixa...' : `Tentativa ${attempt}/${maxRetries}...`);
                 
-                // Atualizar campos do formulário
-                document.getElementById('concurso').value = data.numero;
-                document.getElementById('dataConcurso').value = this.converterDataParaInput(data.dataApuracao);
-                document.getElementById('dezenasUltimoResultado').value = data.listaDezenas.map(n => n.toString().padStart(2, '0')).join(',');
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 segundos
                 
-                this.exibirUltimoResultado();
-                this.atualizarResultadosHistorico(false); // Atualizar sem mostrar alerta
-                this.mostrarAlerta('Último resultado atualizado automaticamente!', 'success');
-            } else {
-                throw new Error('Dados incompletos na resposta da API');
+                const response = await fetch('https://servicebus2.caixa.gov.br/portaldeloterias/api/lotofacil/', {
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data && data.listaDezenas && data.numero && data.dataApuracao) {
+                    // Processar dados da API oficial
+                    this.ultimoResultado = {
+                        concurso: parseInt(data.numero),
+                        data: this.formatarDataBrasil(data.dataApuracao),
+                        dezenas: data.listaDezenas.map(n => n.toString().padStart(2, '0')).sort((a, b) => parseInt(a) - parseInt(b))
+                    };
+                    
+                    // Atualizar campos do formulário
+                    document.getElementById('concurso').value = data.numero;
+                    document.getElementById('dataConcurso').value = this.converterDataParaInput(data.dataApuracao);
+                    document.getElementById('dezenasUltimoResultado').value = data.listaDezenas.map(n => n.toString().padStart(2, '0')).join(',');
+                    
+                    this.exibirUltimoResultado();
+                    this.atualizarResultadosHistorico(false); // Atualizar sem mostrar alerta
+                    this.mostrarAlerta('Último resultado atualizado automaticamente!', 'success');
+                    return; // Sucesso, sair do loop
+                } else {
+                    throw new Error('Dados incompletos na resposta da API');
+                }
+                
+            } catch (error) {
+                lastError = error;
+                console.warn(`Tentativa ${attempt}/${maxRetries} falhou:`, error.message);
+                
+                if (attempt < maxRetries) {
+                    // Esperar antes da próxima tentativa (backoff exponencial)
+                    await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+                }
+            } finally {
+                if (attempt === maxRetries) {
+                    this.mostrarLoading(false);
+                }
             }
-            
-        } catch (error) {
-            console.warn('Erro ao buscar resultado automático:', error);
-            this.mostrarAlerta('Não foi possível buscar o último resultado automaticamente. Insira manualmente.', 'warning');
-        } finally {
-            this.mostrarLoading(false);
         }
+        
+        // Se chegou aqui, todas as tentativas falharam
+        console.error('Todas as tentativas de buscar resultado falharam:', lastError);
+        this.mostrarAlerta('Não foi possível buscar o último resultado automaticamente. Insira manualmente.', 'warning');
     }
     
     formatarDataBrasil(dataString) {
@@ -1175,51 +1272,107 @@ class LotofacilEstrategica {
     async executarEstrategia(idAnalise) {
         const jogos = [];
         const jogosUnicos = new Set();
+        const maxTentativas = 1000; // Evitar loop infinito
         
         // Definir número de jogos: 10 para todas as estratégias
         const numeroJogos = 10;
         
-        while (jogos.length < numeroJogos) {
+        let tentativas = 0;
+        while (jogos.length < numeroJogos && tentativas < maxTentativas) {
+            tentativas++;
+            
             let novoJogo;
             
-            switch (idAnalise) {
-                case 1:
-                    novoJogo = this.estrategiaPoderepetidas();
-                    break;
-                case 2:
-                    novoJogo = this.estrategiaEquilibrioParImpar();
-                    break;
-                case 3:
-                    novoJogo = this.estrategiaNumerosAtrasados();
-                    break;
-                case 4:
-                    novoJogo = this.estrategiaSequenciasInteligentes();
-                    break;
-                case 5:
-                    novoJogo = this.estrategiaDivisaoColunas();
-                    break;
-                case 6:
-                    novoJogo = this.estrategiaFrequenciaHistorica();
-                    break;
-                case 7:
-                    novoJogo = this.estrategiaMatematicaFinais();
-                    break;
-                case 8:
-                    novoJogo = await this.estrategiaFrequenciaMensal();
-                    break;
-                default:
-                    throw new Error('Estratégia não implementada');
-            }
-            
-            const jogoString = novoJogo.sort((a, b) => a - b).join(',');
-            
-            if (!jogosUnicos.has(jogoString)) {
-                jogosUnicos.add(jogoString);
-                jogos.push(novoJogo.sort((a, b) => a - b));
+            try {
+                switch (idAnalise) {
+                    case 1:
+                        novoJogo = this.estrategiaPoderepetidas();
+                        break;
+                    case 2:
+                        novoJogo = this.estrategiaEquilibrioParImpar();
+                        break;
+                    case 3:
+                        novoJogo = this.estrategiaNumerosAtrasados();
+                        break;
+                    case 4:
+                        novoJogo = this.estrategiaSequenciasInteligentes();
+                        break;
+                    case 5:
+                        novoJogo = this.estrategiaDivisaoColunas();
+                        break;
+                    case 6:
+                        novoJogo = this.estrategiaFrequenciaHistorica();
+                        break;
+                    case 7:
+                        novoJogo = this.estrategiaMatematicaFinais();
+                        break;
+                    case 8:
+                        novoJogo = await this.estrategiaFrequenciaMensal();
+                        break;
+                    default:
+                        throw new Error(`Estratégia ${idAnalise} não implementada`);
+                }
+                
+                // Validar jogo gerado
+                if (!this.validarJogo(novoJogo)) {
+                    console.warn(`Jogo inválido gerado pela estratégia ${idAnalise}:`, novoJogo);
+                    continue;
+                }
+                
+                const jogoString = novoJogo.sort((a, b) => a - b).join(',');
+                
+                if (!jogosUnicos.has(jogoString)) {
+                    jogosUnicos.add(jogoString);
+                    jogos.push(novoJogo.sort((a, b) => a - b));
+                }
+                
+            } catch (error) {
+                console.error(`Erro na estratégia ${idAnalise}:`, error);
+                // Gerar jogo aleatório como fallback
+                novoJogo = this.gerarJogoAleatorio();
+                const jogoString = novoJogo.sort((a, b) => a - b).join(',');
+                if (!jogosUnicos.has(jogoString)) {
+                    jogosUnicos.add(jogoString);
+                    jogos.push(novoJogo.sort((a, b) => a - b));
+                }
             }
         }
         
+        if (jogos.length < numeroJogos) {
+            console.warn(`Apenas ${jogos.length} jogos únicos foram gerados para a estratégia ${idAnalise}`);
+        }
+        
         return jogos;
+    }
+    
+    validarJogo(jogo) {
+        if (!Array.isArray(jogo)) return false;
+        if (jogo.length !== 15) return false;
+        
+        // Verificar se todos são números válidos
+        const todosValidos = jogo.every(num => 
+            typeof num === 'number' && 
+            Number.isInteger(num) && 
+            num >= 1 && 
+            num <= 25
+        );
+        
+        if (!todosValidos) return false;
+        
+        // Verificar duplicatas
+        const unicos = new Set(jogo);
+        return unicos.size === 15;
+    }
+    
+    gerarJogoAleatorio() {
+        const numeros = [];
+        while (numeros.length < 15) {
+            const num = Math.floor(Math.random() * 25) + 1;
+            if (!numeros.includes(num)) {
+                numeros.push(num);
+            }
+        }
+        return numeros.sort((a, b) => a - b);
     }
     
     // === ESTRATÉGIAS APRIMORADAS COM NÚMEROS DE REFERÊNCIA ===
@@ -1829,15 +1982,20 @@ class LotofacilEstrategica {
                 }
             }
             
-            // Buscar últimos resultados da API da Caixa
+            // Buscar últimos resultados da API da Caixa com timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos
+            
             const response = await fetch('https://servicebus2.caixa.gov.br/portaldeloterias/api/lotofacil/', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
                     'Cache-Control': 'no-cache'
                 },
-                timeout: 10000 // 10 segundos timeout
+                signal: controller.signal
             });
+            
+            clearTimeout(timeoutId);
             
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
