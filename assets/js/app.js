@@ -16,10 +16,10 @@ class LotofacilEstrategica {
             {
                 id: 1,
                 titulo: "Poder das Repetidas",
-                descricao: "Utiliza números que saíram no último concurso + análise dos 9 números mais frequentes dos últimos 150 concursos + critério de equilíbrio par/ímpar.",
+                descricao: "Utiliza os 9 números mais frequentes dos últimos 150 concursos + combinações baseando-se na estatística de que 60% dos concursos repetem ao menos 5 números.",
                 icon: "fas fa-redo",
                 cor: "from-blue-400 to-blue-600",
-                detalhes: "Esta estratégia combina números do último resultado com os 9 mais frequentes dos últimos 150 concursos, aplicando também balanceamento par/ímpar para maior eficácia."
+                detalhes: "Esta estratégia usa os 9 números mais frequentes dos últimos 150 concursos como base, garantindo que cada jogo tenha pelo menos 5 números repetidos, seguindo a estatística de 60% de repetição."
             },
             {
                 id: 2,
@@ -1224,52 +1224,52 @@ class LotofacilEstrategica {
     
     // === ESTRATÉGIAS APRIMORADAS COM NÚMEROS DE REFERÊNCIA ===
     
-    // Estratégia 1: Poder das Repetidas + Números de Referência + Equilíbrio Par/Ímpar
+    // Estratégia 1: Poder das Repetidas - 9 números mais frequentes + estatística de 60% de repetição
     estrategiaPoderepetidas() {
         const jogo = [];
         
-        // 1. Incluir números de referência (prioridade alta - 40% do jogo)
-        const numerosRef = [...this.numerosReferencia].sort(() => 0.5 - Math.random()).slice(0, 6);
-        jogo.push(...numerosRef);
+        // 1. Garantir que temos pelo menos 5 números dos 9 mais frequentes (baseado na estatística de 60%)
+        const numerosFrequentes = [...this.numerosReferencia];
+        const minRepetidos = 5; // Pelo menos 5 números dos mais frequentes
+        const maxRepetidos = 7; // Máximo 7 para dar espaço para outros números
         
-        // 2. Se temos último resultado, usar alguns números dele (30% do jogo)
-        if (this.ultimoResultado) {
-            const repetidas = this.ultimoResultado.dezenas
-                .map(n => parseInt(n))
-                .filter(n => !jogo.includes(n))
-                .sort(() => 0.5 - Math.random())
-                .slice(0, 4);
-            jogo.push(...repetidas);
-        }
+        // Selecionar entre 5-7 números dos mais frequentes
+        const quantidadeRepetidos = minRepetidos + Math.floor(Math.random() * (maxRepetidos - minRepetidos + 1));
+        this.embaralharArray(numerosFrequentes);
+        jogo.push(...numerosFrequentes.slice(0, quantidadeRepetidos));
         
-        // 3. Aplicar critério de equilíbrio par/ímpar para completar
+        // 2. Aplicar balanceamento par/ímpar nos números selecionados
         const paresNoJogo = jogo.filter(n => n % 2 === 0).length;
         const imparesNoJogo = jogo.filter(n => n % 2 === 1).length;
         
-        // Determinar quantos pares/ímpares ainda precisamos
+        // Meta: 7-8 pares e 7-8 ímpares
         const targetPares = Math.random() < 0.5 ? 7 : 8;
         const targetImpares = 15 - targetPares;
         
         const paresNecessarios = Math.max(0, targetPares - paresNoJogo);
         const imparesNecessarios = Math.max(0, targetImpares - imparesNoJogo);
         
-        // Adicionar pares necessários
-        const paresDisponiveis = [];
-        for (let i = 2; i <= 24; i += 2) {
-            if (!jogo.includes(i)) paresDisponiveis.push(i);
+        // 3. Completar com números pares se necessário
+        if (paresNecessarios > 0) {
+            const paresDisponiveis = [];
+            for (let i = 2; i <= 24; i += 2) {
+                if (!jogo.includes(i)) paresDisponiveis.push(i);
+            }
+            this.embaralharArray(paresDisponiveis);
+            jogo.push(...paresDisponiveis.slice(0, paresNecessarios));
         }
-        this.embaralharArray(paresDisponiveis);
-        jogo.push(...paresDisponiveis.slice(0, paresNecessarios));
         
-        // Adicionar ímpares necessários
-        const imparesDisponiveis = [];
-        for (let i = 1; i <= 25; i += 2) {
-            if (!jogo.includes(i)) imparesDisponiveis.push(i);
+        // 4. Completar com números ímpares se necessário
+        if (imparesNecessarios > 0) {
+            const imparesDisponiveis = [];
+            for (let i = 1; i <= 25; i += 2) {
+                if (!jogo.includes(i)) imparesDisponiveis.push(i);
+            }
+            this.embaralharArray(imparesDisponiveis);
+            jogo.push(...imparesDisponiveis.slice(0, imparesNecessarios));
         }
-        this.embaralharArray(imparesDisponiveis);
-        jogo.push(...imparesDisponiveis.slice(0, imparesNecessarios));
         
-        // Completar se necessário
+        // 5. Garantir que temos exatamente 15 números
         this.completarJogoSeNecessario(jogo);
         
         return jogo.sort((a, b) => a - b);
