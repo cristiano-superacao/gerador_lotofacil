@@ -111,8 +111,8 @@ class LotofacilEstrategica {
             
         } catch (error) {
             console.warn('Erro ao inicializar números de referência:', error);
-            // Usar números de referência padrão baseados em estatísticas históricas
-            this.numerosReferencia = [2, 4, 5, 11, 13, 14, 16, 20, 23]; // Números historicamente mais frequentes
+            // Usar números de referência padrão baseados em estatísticas históricas (em ordem crescente)
+            this.numerosReferencia = [1, 2, 5, 6, 8, 9, 13, 16, 25]; // Números historicamente mais frequentes
         } finally {
             this.mostrarLoading(false);
         }
@@ -206,14 +206,14 @@ class LotofacilEstrategica {
                 frequencia[numero]++;
             });
         });
-        
-        // Ordenar por frequência e pegar os 9 primeiros
+          // Ordenar por frequência e pegar os 9 primeiros
         const numerosOrdenados = Object.entries(frequencia)
             .map(([numero, freq]) => ({ numero: parseInt(numero), frequencia: freq }))
             .sort((a, b) => b.frequencia - a.frequencia)
             .slice(0, 9)
-            .map(item => item.numero);
-        
+            .map(item => item.numero)
+            .sort((a, b) => a - b); // Ordenar em ordem crescente
+
         return numerosOrdenados;
     }
     
@@ -230,7 +230,7 @@ class LotofacilEstrategica {
                     <p class="text-blue-600 text-sm mb-3">
                         Os 9 números mais repetidos nos últimos 150 concursos - usados em todas as estratégias:
                     </p>
-                    <div class="flex flex-wrap gap-2">
+                    <div class="flex flex-wrap justify-center gap-2">
                         ${this.numerosReferencia.map(num => 
                             `<div class="number-ball bg-blue-500 text-white font-bold">${num.toString().padStart(2, '0')}</div>`
                         ).join('')}
