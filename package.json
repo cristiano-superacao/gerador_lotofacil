@@ -1,59 +1,104 @@
 {
   "name": "lotofacil-estrategica",
-  "version": "1.0.0",
-  "description": "Uma ferramenta de apoio para estudos e estratégias da Lotofácil — simples, confiável e prática.",
-  "main": "index.html",
+  "version": "2.1.0",
+  "description": "Ferramenta avançada PWA para estratégias da Lotofácil com 8 algoritmos, testes automatizados e funcionamento offline",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js 3000",
     "dev": "node server.js 3000",
+    "dev:python": "python -m http.server 8080",
     "serve": "python server.py 8000",
-    "build": "echo 'Build completed - projeto é estático'",
-    "test": "echo 'Testes serão implementados em versões futuras'",
-    "deploy:netlify": "netlify deploy --prod",
+    "build": "echo 'Build completo - PWA pronta para produção'",
+    "test": "echo 'Acesse http://localhost:8080/test-complete.html para executar testes' && npm run dev:python",
+    "test:complete": "start http://localhost:8080/test-complete.html && npm run dev:python",
+    "test:functionality": "start http://localhost:8080/test-functionality.html && npm run dev:python",
+    "deploy": "echo 'Execute deploy.bat (Windows) ou deploy.sh (Linux/Mac)'",
+    "deploy:netlify": "netlify deploy --prod --dir .",
     "deploy:vercel": "vercel --prod",
+    "deploy:both": "npm run deploy:netlify && npm run deploy:vercel",
     "validate": "echo 'Validando arquivos...' && node -c assets/js/app.js",
+    "lint": "echo 'Linting seria executado aqui'",
+    "format": "echo 'Formatação seria executada aqui'",
     "clean": "echo 'Limpando arquivos temporários...'",
-    "zip": "powershell Compress-Archive -Path * -DestinationPath lotofacil-estrategica.zip -Force"
+    "zip": "powershell Compress-Archive -Path * -DestinationPath lotofacil-estrategica-v2.1.0.zip -Force",
+    "install:tools": "npm install -g netlify-cli vercel live-server",
+    "setup": "npm install && npm run install:tools",
+    "docs": "echo 'Gerando documentação...'",
+    "analyze": "echo 'Analisando performance da PWA...'"
   },
   "keywords": [
     "lotofacil",
-    "estrategias",
-    "estatisticas",
+    "estrategia",
+    "algoritmos",
+    "estatistica",
+    "pwa",
+    "progressive-web-app",
+    "service-worker",
+    "offline",
+    "caixa-economica",
+    "api",
+    "testes-automatizados",
+    "javascript",
+    "responsive",
+    "mobile",
+    "lottery",
+    "brasil",
+    "gaming",
+    "statistics",
+    "analysis",
     "jogos",
-    "analises",
     "numeros",
     "probabilidade",
     "matematica"
   ],
   "author": {
-    "name": "LotoFácil Estratégica Team",
-    "email": "contato@lotofacilestrategica.com",
-    "url": "https://github.com/seu-usuario/lotofacil-estrategica"
+    "name": "Cristiano Superação",
+    "email": "dev@lotofacilestrategica.com",
+    "url": "https://github.com/cristiano-superacao"
   },
   "license": "MIT",
-  "homepage": "https://seu-usuario.github.io/lotofacil-estrategica/",
+  "homepage": "https://cristiano-superacao.github.io/gerador_lotofacil/",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/seu-usuario/lotofacil-estrategica.git"
+    "url": "git+https://github.com/cristiano-superacao/gerador_lotofacil.git"
   },
   "bugs": {
-    "url": "https://github.com/seu-usuario/lotofacil-estrategica/issues"
+    "url": "https://github.com/cristiano-superacao/gerador_lotofacil/issues"
   },
   "engines": {
-    "node": "20.x",
-    "npm": ">=10.0.0"
+    "node": ">=12.0.0",
+    "npm": ">=6.0.0"
   },
   "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie <= 11",
     "defaults",
-    "not IE 11",
     "maintained node versions"
   ],
+  "pwa": {
+    "name": "LotoFácil Estratégica",
+    "short_name": "LotoFácil",
+    "description": "8 estratégias inteligentes para Lotofácil",
+    "theme_color": "#1e40af",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "start_url": "/",
+    "scope": "/"
+  },
+  "config": {
+    "port": 8080,
+    "test_port": 8081,
+    "api_timeout": 10000,
+    "cache_duration": 1800000
+  },
   "devDependencies": {
     "http-server": "^14.1.1",
     "live-server": "^1.2.2"
   },
   "optionalDependencies": {
     "netlify-cli": "^17.0.0",
-    "vercel": "^32.0.0"
+    "vercel": "^33.0.0"
   }
 }
