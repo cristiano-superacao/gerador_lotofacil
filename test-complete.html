@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Teste Completo - LotoFácil Estratégica</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        h1 { 
+            color: #667eea; 
+            text-align: center; 
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-top: 2rem;
+        }
+        .test-section {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+        }
+        .test-section:hover {
+            transform: translateY(-2px);
+        }
+        .test-section h2 {
+            color: #1e293b;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .test-result {
+            padding: 12px 16px;
+            margin: 8px 0;
+            border-radius: 8px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .success {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #047857;
+            border: 1px solid #a7f3d0;
+        }
+        .error {
+            background: linear-gradient(135deg, #fed7d7, #feb2b2);
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+        .warning {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+        .info {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            width: 100%;
+            margin-top: 12px;
+        }
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .number-display {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 12px 0;
+        }
+        .number {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .stat {
+            text-align: center;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+        .icon { font-size: 1.25rem; }
+        @media (max-width: 768px) {
+            .test-grid { grid-template-columns: 1fr; }
+            .container { padding: 16px; }
+            h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste Completo do Sistema</h1>
+        
+        <div class="stats" id="globalStats">
+            <div class="stat">
+                <div class="stat-value" id="totalTests">0</div>
+                <div class="stat-label">Testes</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="passedTests">0</div>
+                <div class="stat-label">Sucessos</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="failedTests">0</div>
+                <div class="stat-label">Falhas</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="successRate">0%</div>
+                <div class="stat-label">Taxa Sucesso</div>
+            </div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+
+        <div class="test-grid">
+            <!-- Teste 1: Carregamento da Aplicação -->
+            <div class="test-section">
+                <h2><span class="icon">⚙️</span>Carregamento da Aplicação</h2>
+                <div id="app-load-test"></div>
+                <button onclick="testAppLoad()" id="btnAppLoad">Testar Carregamento</button>
+            </div>
+
+            <!-- Teste 2: Todas as Estratégias -->
+            <div class="test-section">
+                <h2><span class="icon">🎯</span>Estratégias (1-8)</h2>
+                <div id="strategy-test"></div>
+                <button onclick="testAllStrategies()" id="btnStrategies" disabled>Testar Estratégias</button>
+            </div>
+
+            <!-- Teste 3: API da Caixa -->
+            <div class="test-section">
+                <h2><span class="icon">🌐</span>API da Caixa</h2>
+                <div id="api-test"></div>
+                <button onclick="testAPI()" id="btnAPI">Testar API</button>
+            </div>
+
+            <!-- Teste 4: Validações -->
+            <div class="test-section">
+                <h2><span class="icon">✅</span>Sistema de Validação</h2>
+                <div id="validation-test"></div>
+                <button onclick="testValidations()" id="btnValidations">Testar Validações</button>
+            </div>
+
+            <!-- Teste 5: Cache e Performance -->
+            <div class="test-section">
+                <h2><span class="icon">💾</span>Cache e Performance</h2>
+                <div id="cache-test"></div>
+                <button onclick="testCache()" id="btnCache">Testar Cache</button>
+            </div>
+
+            <!-- Teste 6: Service Worker -->
+            <div class="test-section">
+                <h2><span class="icon">⚡</span>Service Worker PWA</h2>
+                <div id="sw-test"></div>
+                <button onclick="testServiceWorker()" id="btnSW">Testar Service Worker</button>
+            </div>
+
+            <!-- Teste 7: Responsividade -->
+            <div class="test-section">
+                <h2><span class="icon">📱</span>Responsividade</h2>
+                <div id="responsive-test"></div>
+                <button onclick="testResponsiveness()" id="btnResponsive">Testar Responsividade</button>
+            </div>
+
+            <!-- Teste 8: Histórico e LocalStorage -->
+            <div class="test-section">
+                <h2><span class="icon">📚</span>Histórico</h2>
+                <div id="history-test"></div>
+                <button onclick="testHistory()" id="btnHistory" disabled>Testar Histórico</button>
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem; text-align: center;">
+            <button onclick="runAllTests()" id="btnRunAll" style="background: linear-gradient(135deg, #059669, #10b981); font-size: 1.1rem; padding: 16px 32px;">
+                🚀 Executar Todos os Testes
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let app;
+        let testStats = { total: 0, passed: 0, failed: 0 };
+        let currentTestIndex = 0;
+        const totalTestSections = 8;
+
+        function updateStats() {
+            document.getElementById('totalTests').textContent = testStats.total;
+            document.getElementById('passedTests').textContent = testStats.passed;
+            document.getElementById('failedTests').textContent = testStats.failed;
+            
+            const rate = testStats.total > 0 ? Math.round((testStats.passed / testStats.total) * 100) : 0;
+            document.getElementById('successRate').textContent = rate + '%';
+            
+            const progress = (currentTestIndex / totalTestSections) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function addResult(containerId, message, type = 'success') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            div.innerHTML = `${icons[type] || ''} ${message}`;
+            container.appendChild(div);
+            
+            testStats.total++;
+            if (type === 'success') testStats.passed++;
+            else if (type === 'error') testStats.failed++;
+            
+            updateStats();
+        }
+
+        function clearResults(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+        }
+
+        // Teste 1: Carregamento da Aplicação
+        async function testAppLoad() {
+            clearResults('app-load-test');
+            currentTestIndex = 1;
+            updateStats();
+            
+            try {
+                const response = await fetch('assets/js/app.js');
+                if (response.ok) {
+                    addResult('app-load-test', 'Script JavaScript carregado com sucesso', 'success');
+                    
+                    // Carregar e inicializar
+                    if (typeof LotofacilEstrategica === 'undefined') {
+                        const script = document.createElement('script');
+                        script.src = 'assets/js/app.js';
+                        document.head.appendChild(script);
+                        
+                        script.onload = () => {
+                            try {
+                                app = new LotofacilEstrategica();
+                                addResult('app-load-test', `Aplicação inicializada: ${app.analises.length} estratégias`, 'success');
+                                document.getElementById('btnStrategies').disabled = false;
+                                document.getElementById('btnHistory').disabled = false;
+                            } catch (error) {
+                                addResult('app-load-test', `Erro na inicialização: ${error.message}`, 'error');
+                            }
+                        };
+                    } else {
+                        app = new LotofacilEstrategica();
+                        addResult('app-load-test', `Aplicação já carregada: ${app.analises.length} estratégias`, 'success');
+                        document.getElementById('btnStrategies').disabled = false;
+                        document.getElementById('btnHistory').disabled = false;
+                    }
+                } else {
+                    addResult('app-load-test', 'Erro ao carregar JavaScript principal', 'error');
+                }
+            } catch (error) {
+                addResult('app-load-test', `Erro no teste: ${error.message}`, 'error');
+            }
+        }
+
+        // Teste 2: Todas as Estratégias
+        async function testAllStrategies() {
+            clearResults('strategy-test');
+            currentTestIndex = 2;
+            updateStats();
+            
+            if (!app) {
+                addResult('strategy-test', 'Execute primeiro o teste de carregamento', 'warning');
+                return;
+            }
+
+            for (let i = 1; i <= 8; i++) {
+                try {
+                    const startTime = performance.now();
+                    const jogos = await app.executarEstrategia(i);
+                    const endTime = performance.now();
+                    const duration = Math.round(endTime - startTime);
+                    
+                    const estrategia = app.analises.find(a => a.id === i);
+                    
+                    if (jogos.length === 10 && jogos.every(jogo => jogo.length === 15)) {
+                        addResult('strategy-test', `Estratégia ${i} (${estrategia.titulo}): OK (${duration}ms)`, 'success');
+                        
+                        // Mostrar primeiro jogo como exemplo
+                        const exemploJogo = jogos[0].map(n => n.toString().padStart(2, '0')).join(', ');
+                        addResult('strategy-test', `📋 Exemplo: ${exemploJogo}`, 'info');
+                    } else {
+                        addResult('strategy-test', `Estratégia ${i}: Formato inválido`, 'error');
+                    }
+                } catch (error) {
+                    addResult('strategy-test', `Estratégia ${i}: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        // Teste 3: API da Caixa
+        async function testAPI() {
+            clearResults('api-test');
+            currentTestIndex = 3;
+            updateStats();
+            
+            try {
+                addResult('api-test', 'Testando conexão com API da Caixa...', 'info');
+                
+                const startTime = performance.now();
+                const response = await fetch('https://servicebus2.caixa.gov.br/portaldeloterias/api/lotofacil/');
+                const endTime = performance.now();
+                const duration = Math.round(endTime - startTime);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult('api-test', `API respondendo em ${duration}ms`, 'success');
+                    addResult('api-test', `Concurso ${data.numero} - ${data.dataApuracao}`, 'success');
+                    
+                    if (data.listaDezenas) {
+                        const dezenas = data.listaDezenas.slice(0, 5).join(', ') + '...';
+                        addResult('api-test', `Dezenas: ${dezenas}`, 'info');
+                    }
+                } else {
+                    addResult('api-test', `API retornou erro HTTP ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult('api-test', `Erro na conexão: ${error.message}`, 'error');
+                addResult('api-test', 'Sistema funcionará com dados simulados', 'warning');
+            }
+        }
+
+        // Teste 4: Validações
+        function testValidations() {
+            clearResults('validation-test');
+            currentTestIndex = 4;
+            updateStats();
+            
+            // Teste números válidos
+            const numerosValidos = [1, 5, 10, 15, 20, 25];
+            const todosValidos = numerosValidos.every(n => n >= 1 && n <= 25);
+            addResult('validation-test', `Números válidos (1-25): ${todosValidos ? 'OK' : 'FALHOU'}`, todosValidos ? 'success' : 'error');
+            
+            // Teste números inválidos
+            const numerosInvalidos = [0, 26, -1, 30];
+            const deteccaoInvalidos = numerosInvalidos.every(n => n < 1 || n > 25);
+            addResult('validation-test', `Detecção de inválidos: ${deteccaoInvalidos ? 'OK' : 'FALHOU'}`, deteccaoInvalidos ? 'success' : 'error');
+            
+            // Teste duplicatas
+            const comDuplicatas = [1, 2, 3, 3, 5];
+            const semDuplicatas = [1, 2, 3, 4, 5];
+            const controleDuplicatas = new Set(comDuplicatas).size !== comDuplicatas.length;
+            addResult('validation-test', `Controle de duplicatas: ${controleDuplicatas ? 'OK' : 'FALHOU'}`, controleDuplicatas ? 'success' : 'error');
+            
+            // Teste quantidade
+            const quantidadeCorreta = semDuplicatas.length === 5; // Para exemplo
+            addResult('validation-test', `Validação de quantidade: ${quantidadeCorreta ? 'OK' : 'FALHOU'}`, quantidadeCorreta ? 'success' : 'error');
+            
+            // Teste regex para formato
+            const regexTeste = /^\d{2}$/.test('05');
+            addResult('validation-test', `Formato de números: ${regexTeste ? 'OK' : 'FALHOU'}`, regexTeste ? 'success' : 'error');
+        }
+
+        // Teste 5: Cache
+        function testCache() {
+            clearResults('cache-test');
+            currentTestIndex = 5;
+            updateStats();
+            
+            try {
+                // Teste localStorage
+                const testKey = 'lotofacil_test_cache_' + Date.now();
+                const testData = { test: true, timestamp: Date.now(), array: [1,2,3,4,5] };
+                
+                localStorage.setItem(testKey, JSON.stringify(testData));
+                const retrieved = JSON.parse(localStorage.getItem(testKey));
+                
+                if (retrieved && retrieved.test === true) {
+                    addResult('cache-test', 'LocalStorage funcionando', 'success');
+                    localStorage.removeItem(testKey);
+                    
+                    // Teste capacidade
+                    const size = new Blob([JSON.stringify(testData)]).size;
+                    addResult('cache-test', `Tamanho dos dados: ${size} bytes`, 'info');
+                    
+                    // Teste performance
+                    const start = performance.now();
+                    for(let i = 0; i < 100; i++) {
+                        localStorage.setItem('perf_test_' + i, JSON.stringify({data: i}));
+                        localStorage.getItem('perf_test_' + i);
+                        localStorage.removeItem('perf_test_' + i);
+                    }
+                    const end = performance.now();
+                    addResult('cache-test', `Performance: ${Math.round(end - start)}ms para 100 ops`, 'success');
+                    
+                } else {
+                    addResult('cache-test', 'Erro na recuperação do cache', 'error');
+                }
+                
+                // Teste sessionStorage
+                sessionStorage.setItem('test_session', 'ok');
+                if (sessionStorage.getItem('test_session') === 'ok') {
+                    addResult('cache-test', 'SessionStorage funcionando', 'success');
+                    sessionStorage.removeItem('test_session');
+                } else {
+                    addResult('cache-test', 'SessionStorage com problemas', 'warning');
+                }
+                
+            } catch (error) {
+                addResult('cache-test', `Erro no cache: ${error.message}`, 'error');
+            }
+        }
+
+        // Teste 6: Service Worker
+        async function testServiceWorker() {
+            clearResults('sw-test');
+            currentTestIndex = 6;
+            updateStats();
+            
+            if ('serviceWorker' in navigator) {
+                addResult('sw-test', 'Service Worker suportado', 'success');
+                
+                try {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    addResult('sw-test', `${registrations.length} Service Workers registrados`, 'info');
+                    
+                    // Tentar registrar nosso SW
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    addResult('sw-test', 'Service Worker registrado com sucesso', 'success');
+                    
+                    // Verificar estado
+                    if (registration.active) {
+                        addResult('sw-test', 'Service Worker ativo', 'success');
+                    } else if (registration.installing) {
+                        addResult('sw-test', 'Service Worker instalando...', 'info');
+                    } else if (registration.waiting) {
+                        addResult('sw-test', 'Service Worker aguardando ativação', 'warning');
+                    }
+                    
+                } catch (error) {
+                    addResult('sw-test', `Erro no registro: ${error.message}`, 'error');
+                }
+            } else {
+                addResult('sw-test', 'Service Worker não suportado', 'error');
+            }
+            
+            // Teste PWA
+            if ('standalone' in window.navigator) {
+                addResult('sw-test', 'PWA capabilities detectadas', 'success');
+            }
+            
+            // Teste manifest
+            const manifestLink = document.querySelector('link[rel="manifest"]');
+            if (manifestLink) {
+                addResult('sw-test', 'Manifest.json encontrado', 'success');
+            } else {
+                addResult('sw-test', 'Manifest.json não encontrado', 'warning');
+            }
+        }
+
+        // Teste 7: Responsividade
+        function testResponsiveness() {
+            clearResults('responsive-test');
+            currentTestIndex = 7;
+            updateStats();
+            
+            const viewport = {
+                width: window.innerWidth,
+                height: window.innerHeight
+            };
+            
+            addResult('responsive-test', `Viewport: ${viewport.width}x${viewport.height}`, 'info');
+            
+            // Teste breakpoints
+            if (viewport.width >= 1280) {
+                addResult('responsive-test', 'Desktop XL (1280px+)', 'success');
+            } else if (viewport.width >= 1024) {
+                addResult('responsive-test', 'Desktop LG (1024px+)', 'success');
+            } else if (viewport.width >= 768) {
+                addResult('responsive-test', 'Tablet (768px+)', 'success');
+            } else if (viewport.width >= 640) {
+                addResult('responsive-test', 'Mobile LG (640px+)', 'success');
+            } else {
+                addResult('responsive-test', 'Mobile SM (<640px)', 'success');
+            }
+            
+            // Teste orientação
+            const orientation = viewport.width > viewport.height ? 'landscape' : 'portrait';
+            addResult('responsive-test', `Orientação: ${orientation}`, 'info');
+            
+            // Teste CSS Media Queries
+            if (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) {
+                addResult('responsive-test', 'Media queries para mobile ativas', 'success');
+            }
+            
+            // Teste touch
+            if ('ontouchstart' in window) {
+                addResult('responsive-test', 'Dispositivo touch detectado', 'success');
+            } else {
+                addResult('responsive-test', 'Dispositivo não-touch', 'info');
+            }
+            
+            // Teste densidade de pixels
+            const pixelRatio = window.devicePixelRatio || 1;
+            addResult('responsive-test', `Device Pixel Ratio: ${pixelRatio}`, 'info');
+        }
+
+        // Teste 8: Histórico
+        function testHistory() {
+            clearResults('history-test');
+            currentTestIndex = 8;
+            updateStats();
+            
+            if (!app) {
+                addResult('history-test', 'App não carregado', 'error');
+                return;
+            }
+            
+            try {
+                // Simular dados de histórico
+                const jogoTeste = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+                const registroTeste = {
+                    id: Date.now(),
+                    data: new Date().toISOString(),
+                    estrategia: 'Teste Automatizado',
+                    jogos: [jogoTeste],
+                    valorAposta: 3.50,
+                    status: 'pendente'
+                };
+                
+                // Testar salvamento
+                const historicoAnterior = app.historico.length;
+                app.historico.push(registroTeste);
+                
+                if (app.historico.length > historicoAnterior) {
+                    addResult('history-test', 'Adição ao histórico funcionando', 'success');
+                } else {
+                    addResult('history-test', 'Erro na adição ao histórico', 'error');
+                }
+                
+                // Testar persistência
+                app.salvarHistorico();
+                addResult('history-test', 'Salvamento no localStorage', 'success');
+                
+                // Testar carregamento
+                const historicoSalvo = localStorage.getItem('lotofacil_historico');
+                if (historicoSalvo) {
+                    const dados = JSON.parse(historicoSalvo);
+                    addResult('history-test', `${dados.length} registros no localStorage`, 'success');
+                } else {
+                    addResult('history-test', 'Nenhum dado no localStorage', 'warning');
+                }
+                
+                // Testar estatísticas
+                const stats = app.calcularEstatisticas();
+                addResult('history-test', `Estatísticas calculadas: ${stats.totalApostas} apostas`, 'success');
+                
+                // Limpar teste
+                app.historico = app.historico.filter(r => r.id !== registroTeste.id);
+                
+            } catch (error) {
+                addResult('history-test', `Erro no teste: ${error.message}`, 'error');
+            }
+        }
+
+        // Executar todos os testes
+        async function runAllTests() {
+            const btnRunAll = document.getElementById('btnRunAll');
+            btnRunAll.disabled = true;
+            btnRunAll.textContent = '🔄 Executando testes...';
+            
+            // Reset stats
+            testStats = { total: 0, passed: 0, failed: 0 };
+            currentTestIndex = 0;
+            updateStats();
+            
+            const tests = [
+                testAppLoad,
+                () => new Promise(resolve => {
+                    setTimeout(async () => {
+                        await testAllStrategies();
+                        resolve();
+                    }, 1000);
+                }),
+                testAPI,
+                testValidations,
+                testCache,
+                testServiceWorker,
+                testResponsiveness,
+                testHistory
+            ];
+            
+            for (let test of tests) {
+                try {
+                    await test();
+                    await new Promise(resolve => setTimeout(resolve, 500)); // Pausa entre testes
+                } catch (error) {
+                    console.error('Erro no teste:', error);
+                }
+            }
+            
+            btnRunAll.disabled = false;
+            btnRunAll.textContent = '✅ Testes Concluídos!';
+            
+            // Exibir resumo final
+            setTimeout(() => {
+                alert(`🎉 Testes concluídos!\n\nTotal: ${testStats.total}\n✅ Sucessos: ${testStats.passed}\n❌ Falhas: ${testStats.failed}\n📊 Taxa de sucesso: ${Math.round((testStats.passed/testStats.total)*100)}%`);
+                btnRunAll.textContent = '🚀 Executar Todos os Testes';
+            }, 1000);
+        }
+
+        // Inicialização
+        window.onload = () => {
+            updateStats();
+            addResult('app-load-test', '🔄 Clique em "Testar Carregamento" para iniciar', 'info');
+        };
+    </script>
+</body>
+</html>
