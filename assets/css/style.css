@@ -334,6 +334,15 @@
     max-height: none !important;
 }
 
+/* Garantir que estratégias 9 e 10 sejam visíveis */
+#cardsAnalises [data-strategy-id="9"],
+#cardsAnalises [data-strategy-id="10"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 1 !important;
+}
+
 /* Layout específico para as 10 estratégias */
 @media (min-width: 1280px) {
     #cardsAnalises {

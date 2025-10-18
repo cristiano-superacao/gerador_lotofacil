@@ -52,6 +52,11 @@ class LotofacilEstrategica {
         // Verificar se todos os métodos das estratégias existem
         this.verificarMetodosEstrategias();
         
+        // Força re-renderização das estratégias após carregamento completo
+        setTimeout(() => {
+            this.garantirTodasEstrategias();
+        }, 5000);
+        
         // Definição das 10 análises estratégicas com integração API oficial da Caixa
         this.analises = [
             {
@@ -597,6 +602,37 @@ class LotofacilEstrategica {
                 console.warn('⚠️ Ainda há estratégias faltantes:', 10 - totalCards);
             }
         }, 1000);
+    }
+
+    // 🎯 Garantir que todas as 10 estratégias estejam visíveis
+    garantirTodasEstrategias() {
+        const container = document.getElementById('cardsAnalises');
+        const cardsAtual = container.children.length;
+        
+        console.log(`🎯 Verificação final: ${cardsAtual}/10 estratégias carregadas`);
+        
+        if (cardsAtual < 10) {
+            console.log('🔄 Re-carregando todas as estratégias...');
+            
+            // Limpar container
+            container.innerHTML = '';
+            
+            // Recriar todas as estratégias
+            this.analises.forEach((analise, index) => {
+                console.log(`📊 [${index + 1}/10] Recriando: ${analise.titulo}`);
+                try {
+                    const card = this.criarCardAnalise(analise);
+                    container.appendChild(card);
+                    console.log(`✅ Estratégia ${analise.id} recriada com sucesso`);
+                } catch (error) {
+                    console.error(`❌ Erro ao recriar estratégia ${analise.id}:`, error);
+                }
+            });
+            
+            console.log(`🎉 Recriação concluída: ${container.children.length}/10 estratégias`);
+        } else {
+            console.log('✅ Todas as 10 estratégias já estão visíveis!');
+        }
     }
 
     criarCardAnalise(analise) {
