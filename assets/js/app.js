@@ -31,6 +31,9 @@ class LotofacilEstrategica {
         // Aguardar inicialização e sincronizar dados
         this.inicializarSistema();
         
+        // Verificar se todos os métodos das estratégias existem
+        this.verificarMetodosEstrategias();
+        
         // Definição das 10 análises estratégicas com integração API oficial da Caixa
         this.analises = [
             {
@@ -431,18 +434,40 @@ class LotofacilEstrategica {
         
         console.log('📊 Carregando análises... Total:', this.analises.length);
         
+        console.log('📋 Total de estratégias definidas:', this.analises.length);
+        console.log('📋 Estratégias:', this.analises.map(a => `${a.id}: ${a.titulo}`));
+        
         this.analises.forEach((analise, index) => {
-            console.log(`Carregando análise ${index + 1}: ${analise.titulo}`);
-            const card = this.criarCardAnalise(analise);
-            container.appendChild(card);
+            console.log(`📊 [${index + 1}/${this.analises.length}] Carregando estratégia:`, analise.id, '-', analise.titulo);
+            
+            try {
+                const card = this.criarCardAnalise(analise);
+                container.appendChild(card);
+                console.log(`✅ Card ${analise.id} adicionado com sucesso`);
+            } catch (error) {
+                console.error(`❌ Erro ao criar card ${analise.id}:`, error);
+            }
         });
         
-        console.log('✅ Todas as análises carregadas no DOM');
+        console.log('✅ Carregamento concluído - Total de cards no DOM:', container.children.length);
+        
+        // Verificação adicional
+        setTimeout(() => {
+            const totalCardsVisible = container.querySelectorAll('div.bg-white').length;
+            console.log('👀 Cards visíveis após timeout:', totalCardsVisible);
+            
+            if (totalCardsVisible !== 10) {
+                console.warn('⚠️ PROBLEMA: Esperado 10 cards, encontrado:', totalCardsVisible);
+            }
+        }, 1000);
     }
     
     criarCardAnalise(analise) {
+        console.log('🎨 Criando card para estratégia:', analise.id, '-', analise.titulo);
+        
         const card = document.createElement('div');
         card.className = 'bg-white rounded-lg card-shadow p-6 cursor-pointer transform transition-all duration-300 hover:scale-105';
+        card.setAttribute('data-strategy-id', analise.id);
         
         // Definir número de jogos: 10 para todas as estratégias
         const numeroJogos = 10;
@@ -2775,6 +2800,44 @@ class LotofacilEstrategica {
     solicitarNumerosRemover() {
         // Por enquanto retorna null, mas pode ser implementado com modal/prompt
         return null;
+    }
+    
+    // 🔍 Verificar se todos os métodos das estratégias existem
+    verificarMetodosEstrategias() {
+        console.log('🔍 Verificando métodos das estratégias...');
+        
+        const metodosEsperados = [
+            'estrategiaPoderepetidas',
+            'estrategiaEquilibrioParImpar', 
+            'estrategiaNumerosAtrasados',
+            'estrategiaSequenciasInteligentes',
+            'estrategiaDivisaoColunas',
+            'estrategiaFrequenciaHistorica',
+            'estrategiaMatematicaFinais',
+            'estrategiaFrequenciaMensal',
+            'estrategiaTiraCinco',
+            'estrategiaBingoCaixa'
+        ];
+        
+        const metodosAusentes = [];
+        
+        metodosEsperados.forEach((metodo, index) => {
+            const estrategiaId = index + 1;
+            if (typeof this[metodo] === 'function') {
+                console.log(`✅ Estratégia ${estrategiaId} - ${metodo}: OK`);
+            } else {
+                console.error(`❌ Estratégia ${estrategiaId} - ${metodo}: AUSENTE`);
+                metodosAusentes.push(`${estrategiaId}: ${metodo}`);
+            }
+        });
+        
+        if (metodosAusentes.length > 0) {
+            console.error('🚨 MÉTODOS AUSENTES:', metodosAusentes);
+        } else {
+            console.log('✅ Todos os métodos das estratégias estão implementados');
+        }
+        
+        return metodosAusentes.length === 0;
     }
     
     // Métodos auxiliares para Bingo da Caixa
