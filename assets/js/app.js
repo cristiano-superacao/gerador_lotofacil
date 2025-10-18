@@ -11,6 +11,26 @@ class LotofacilEstrategica {
         this.ultimos150Resultados = [];
         this.numerosReferencia = [];
         
+        // 🗄️ Inicializar sistema unificado de banco de dados
+        this.dbManager = new DatabaseManager();
+        this.strategyManager = new StrategyManager(this.dbManager);
+        
+        // 📊 Inicializar painel de status do sistema
+        this.statusPanel = new SystemStatusPanel(this.dbManager, this.strategyManager);
+        
+        // Conectar botão do painel de status
+        setTimeout(() => {
+            const statusButton = document.getElementById('statusPanelToggle');
+            if (statusButton) {
+                statusButton.addEventListener('click', () => {
+                    this.statusPanel.toggle();
+                });
+            }
+        }, 100);
+        
+        // Aguardar inicialização e sincronizar dados
+        this.inicializarSistema();
+        
         // Definição das 8 análises estratégicas com integração API oficial da Caixa
         this.analises = [
             {
@@ -109,6 +129,33 @@ class LotofacilEstrategica {
         this.inicializarNumerosReferencia();
         this.inicializarServiceWorker();
         this.configurarAtualizacaoAutomatica(); // Nova função para atualização automática
+    }
+    
+    // 🚀 Inicializar sistema unificado de banco de dados
+    async inicializarSistema() {
+        try {
+            console.log('🔄 Inicializando sistema...');
+            
+            // Aguardar inicialização do Firebase
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Sincronizar dados
+            await this.dbManager.sincronizar();
+            
+            // Carregar histórico de jogos
+            const historico = await this.strategyManager.carregarHistorico();
+            if (historico.length > 0) {
+                console.log(`📋 ${historico.length} jogos anteriores carregados`);
+            }
+            
+            // Limpar dados antigos (30 dias)
+            await this.dbManager.limparDadosAntigos(30);
+            
+            console.log('✅ Sistema inicializado com sucesso');
+            
+        } catch (error) {
+            console.error('❌ Erro na inicialização:', error);
+        }
     }
     
     recuperarUltimoResultado() {
@@ -922,21 +969,61 @@ class LotofacilEstrategica {
     
     // === FUNÇÕES DE GERENCIAMENTO DE HISTÓRICO ===
     
-    carregarHistorico() {
+    // 📖 Carregar histórico com sistema unificado
+    async carregarHistorico() {
         try {
-            const historicoSalvo = localStorage.getItem('lotofacil_historico');
+            // Carregar do sistema unificado primeiro
+            const historicoUnificado = await this.strategyManager.carregarHistorico();
+            
+            // Carregar também do localStorage para compatibilidade
+            const historicoLocal = localStorage.getItem('lotofacil_historico');
             const resultadosOficiais = localStorage.getItem('lotofacil_resultados');
             
-            this.historico = historicoSalvo ? JSON.parse(historicoSalvo) : [];
+            this.historico = historicoLocal ? JSON.parse(historicoLocal) : [];
             this.resultadosOficiais = resultadosOficiais ? JSON.parse(resultadosOficiais) : [];
+            
+            // Integrar dados do sistema unificado
+            if (historicoUnificado && historicoUnificado.length > 0) {
+                console.log(`📋 ${historicoUnificado.length} registros carregados do banco unificado`);
+                
+                // Converter formato se necessário e integrar
+                for (const registro of historicoUnificado) {
+                    const existe = this.historico.find(h => 
+                        h.timestamp === registro.timestamp || 
+                        Math.abs(new Date(h.data) - new Date(registro.timestamp)) < 60000
+                    );
+                    
+                    if (!existe) {
+                        const registroConvertido = {
+                            id: registro.timestamp,
+                            data: new Date(registro.timestamp).toISOString(),
+                            estrategia: registro.metadados?.estrategia || 'Estratégia Importada',
+                            jogos: registro.jogos,
+                            valorAposta: registro.metadados?.valorAposta || (registro.jogos.length * 3.5),
+                            status: 'pendente',
+                            acertos: [],
+                            premios: [],
+                            totalPremio: 0
+                        };
+                        this.historico.unshift(registroConvertido);
+                    }
+                }
+            }
             
             this.carregarFiltroEstrategias();
             this.exibirHistorico();
             
         } catch (error) {
-            console.error('Erro ao carregar histórico:', error);
-            this.historico = [];
-            this.resultadosOficiais = [];
+            console.error('❌ Erro ao carregar histórico:', error);
+            // Fallback para localStorage apenas
+            const historicoLocal = localStorage.getItem('lotofacil_historico');
+            const resultadosOficiais = localStorage.getItem('lotofacil_resultados');
+            
+            this.historico = historicoLocal ? JSON.parse(historicoLocal) : [];
+            this.resultadosOficiais = resultadosOficiais ? JSON.parse(resultadosOficiais) : [];
+            
+            this.carregarFiltroEstrategias();
+            this.exibirHistorico();
         }
     }
     
@@ -950,33 +1037,57 @@ class LotofacilEstrategica {
         }
     }
     
-    salvarJogosNoHistorico() {
+    // 💾 Salvar jogos no histórico com sistema unificado de banco de dados
+    async salvarJogosNoHistorico() {
         if (!this.jogosGerados.length) {
             this.mostrarAlerta('Nenhum jogo gerado para salvar!', 'warning');
             return;
         }
         
-        const estrategiaUsada = document.getElementById('estrategiaUsada').textContent;
-        const valorAposta = this.jogosGerados.length * 3.5; // R$ 3,50 por jogo
-        
-        const novoRegistro = {
-            id: Date.now(),
-            data: new Date().toISOString(),
-            estrategia: estrategiaUsada,
-            jogos: [...this.jogosGerados],
-            valorAposta: valorAposta,
-            status: 'pendente',
-            acertos: [],
-            premios: [],
-            totalPremio: 0
-        };
-        
-        this.historico.unshift(novoRegistro);
-        this.salvarHistorico();
-        this.exibirHistorico();
-        this.atualizarEstatisticas();
-        
-        this.mostrarAlerta(`${this.jogosGerados.length} jogos salvos no histórico!`, 'success');
+        try {
+            const estrategiaUsada = document.getElementById('estrategiaUsada').textContent;
+            const valorAposta = this.jogosGerados.length * 3.5; // R$ 3,50 por jogo
+            
+            const novoRegistro = {
+                id: Date.now(),
+                data: new Date().toISOString(),
+                estrategia: estrategiaUsada,
+                jogos: [...this.jogosGerados],
+                valorAposta: valorAposta,
+                status: 'pendente',
+                acertos: [],
+                premios: [],
+                totalPremio: 0
+            };
+            
+            // Salvar no sistema unificado de banco de dados
+            const sucesso = await this.strategyManager.salvarJogo(
+                this.estrategiaAtual?.id || 'manual',
+                this.jogosGerados,
+                {
+                    estrategia: estrategiaUsada,
+                    valorAposta: valorAposta,
+                    dataGeracao: new Date().toISOString()
+                }
+            );
+            
+            if (sucesso) {
+                // Também manter no localStorage para compatibilidade
+                this.historico.unshift(novoRegistro);
+                this.salvarHistorico();
+                this.exibirHistorico();
+                this.atualizarEstatisticas();
+                
+                this.mostrarAlerta(`✅ ${this.jogosGerados.length} jogos salvos com sucesso!`, 'success');
+                console.log('🎯 Jogos salvos no banco de dados unificado');
+            } else {
+                throw new Error('Falha ao salvar no banco de dados');
+            }
+            
+        } catch (error) {
+            console.error('❌ Erro ao salvar jogos:', error);
+            this.mostrarAlerta('Erro ao salvar jogos. Tente novamente.', 'error');
+        }
     }
     
     async atualizarResultadosHistorico(mostrarAlerta = true) {
