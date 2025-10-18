@@ -108,6 +108,7 @@ class LotofacilEstrategica {
         this.buscarUltimoResultadoAutomatico();
         this.inicializarNumerosReferencia();
         this.inicializarServiceWorker();
+        this.configurarAtualizacaoAutomatica(); // Nova função para atualização automática
     }
     
     recuperarUltimoResultado() {
@@ -402,8 +403,13 @@ class LotofacilEstrategica {
             this.salvarUltimoResultado();
         });
         
-        document.getElementById('atualizarResultado').addEventListener('click', () => {
-            this.tentarBuscarResultadoAutomatico();
+        document.getElementById('atualizarResultado').addEventListener('click', (e) => {
+            // Se Ctrl+Click, alternar atualização automática
+            if (e.ctrlKey) {
+                this.alternarAtualizacaoAutomatica();
+            } else {
+                this.tentarBuscarResultadoAutomatico();
+            }
         });
         
         // Botões da seção de resultados
@@ -697,6 +703,202 @@ class LotofacilEstrategica {
         } catch (error) {
             console.warn('Erro na validação dos dados da API:', error.message);
             return false;
+        }
+    }
+
+    // ⏰ Configuração de Atualização Automática do Site da Caixa
+    configurarAtualizacaoAutomatica() {
+        console.log('🔄 Configurando atualização automática dos resultados...');
+        
+        // Verificar a cada 30 minutos se há novos resultados
+        const intervaloPadrao = 30 * 60 * 1000; // 30 minutos
+        
+        // Ativar indicador visual
+        this.ativarIndicadorAuto();
+        
+        // Verificar imediatamente na inicialização
+        setTimeout(() => this.verificarNovoResultado(), 3000);
+        
+        // Configurar verificação periódica
+        this.intervalAtualizacao = setInterval(() => {
+            this.verificarNovoResultado();
+        }, intervaloPadrao);
+        
+        // Configurar verificação quando a aba fica ativa
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                console.log('👁️ Aba ativa - verificando novos resultados...');
+                this.verificarNovoResultado();
+            }
+        });
+        
+        // Configurar verificação quando volta a ter internet
+        window.addEventListener('online', () => {
+            console.log('🌐 Conexão restaurada - verificando novos resultados...');
+            setTimeout(() => this.verificarNovoResultado(), 2000);
+        });
+        
+        // Configurar verificação a cada hora nos horários de sorteio
+        this.configurarVerificacaoHorarios();
+        
+        console.log('✅ Atualização automática configurada!');
+        console.log('🔗 Monitorando: https://loterias.caixa.gov.br/Paginas/Lotofacil.aspx');
+        console.log('📡 API Endpoint: https://servicebus2.caixa.gov.br/portaldeloterias/api/lotofacil/');
+        console.log('⏰ Verificação: A cada 30 minutos + horários de sorteio');
+        console.log('💡 Dica: Ctrl+Click no botão "Atualizar" para desativar/ativar');
+        
+        // Mostrar notificação de boas-vindas
+        setTimeout(() => {
+            this.mostrarAlerta('🔄 Atualização automática ativa! Monitorando resultados da Caixa a cada 30 minutos.', 'info');
+        }, 2000);
+    }
+
+    // 🎯 Ativar indicador visual de atualização automática
+    ativarIndicadorAuto() {
+        const indicador = document.getElementById('indicadorAuto');
+        if (indicador) {
+            indicador.style.display = 'block';
+            indicador.title = 'Atualização automática ativa - Monitora https://loterias.caixa.gov.br/Paginas/Lotofacil.aspx a cada 30min';
+        }
+        
+        // Atualizar texto do botão para mostrar que está automático
+        const btnAtualizar = document.getElementById('atualizarResultado');
+        if (btnAtualizar) {
+            btnAtualizar.title = 'Busca manual + Atualização automática ativa (30min)';
+        }
+    }
+
+    // ⏰ Configurar verificação nos horários típicos de sorteio
+    configurarVerificacaoHorarios() {
+        const verificarHorario = () => {
+            const agora = new Date();
+            const hora = agora.getHours();
+            const minuto = agora.getMinutes();
+            
+            // Horários próximos ao sorteio da Lotofácil (segunda a sábado ~20h)
+            const isHorarioSorteio = hora >= 19 && hora <= 21;
+            const isDiaSemana = agora.getDay() >= 1 && agora.getDay() <= 6; // seg-sab
+            
+            if (isHorarioSorteio && isDiaSemana) {
+                // Verificar a cada 10 minutos no horário de sorteio
+                if (minuto % 10 === 0) {
+                    console.log('🎲 Horário de sorteio - verificação intensiva');
+                    this.verificarNovoResultado();
+                }
+            }
+        };
+        
+        // Verificar a cada minuto
+        setInterval(verificarHorario, 60000);
+    }
+
+    // 🔍 Verificar se há novo resultado disponível
+    async verificarNovoResultado() {
+        try {
+            console.log('🔍 Verificando novos resultados da Lotofácil...');
+            
+            // Obter último resultado salvo
+            const ultimoConhecido = this.ultimoResultado?.concurso || 0;
+            
+            // Buscar último resultado da API
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
+            
+            const response = await fetch('https://servicebus2.caixa.gov.br/portaldeloterias/api/lotofacil/', {
+                signal: controller.signal,
+                headers: {
+                    'Accept': 'application/json',
+                    'Cache-Control': 'no-cache',
+                    'User-Agent': 'LotoFacil-Estrategica/2.1'
+                }
+            });
+            
+            clearTimeout(timeoutId);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (this.validarDadosAPI(data)) {
+                const novoNumero = parseInt(data.numero);
+                
+                if (novoNumero > ultimoConhecido) {
+                    console.log(`🎉 Novo resultado encontrado! Concurso ${novoNumero}`);
+                    
+                    // Atualizar automaticamente
+                    this.ultimoResultado = {
+                        concurso: novoNumero,
+                        data: this.formatarDataBrasil(data.dataApuracao),
+                        dezenas: data.listaDezenas.map(n => n.toString().padStart(2, '0')).sort((a, b) => parseInt(a) - parseInt(b))
+                    };
+                    
+                    // Atualizar interface
+                    document.getElementById('concurso').value = data.numero;
+                    document.getElementById('dataConcurso').value = this.converterDataParaInput(data.dataApuracao);
+                    document.getElementById('dezenasUltimoResultado').value = data.listaDezenas.map(n => n.toString().padStart(2, '0')).join(',');
+                    
+                    // Salvar no cache
+                    localStorage.setItem('ultimo_resultado_automatico', JSON.stringify(this.ultimoResultado));
+                    localStorage.setItem('ultimo_resultado_automatico_time', Date.now().toString());
+                    
+                    // Atualizar visualmente
+                    this.exibirUltimoResultado();
+                    this.atualizarResultadosHistorico(false);
+                    
+                    // Notificar usuário
+                    this.mostrarAlerta(`🎉 Novo resultado! Concurso ${novoNumero} atualizado automaticamente!`, 'success');
+                    
+                    // Adicionar efeito visual no botão "Atualizar"
+                    const btnAtualizar = document.querySelector('[onclick*="buscarUltimoResultadoAutomatico"]');
+                    if (btnAtualizar) {
+                        btnAtualizar.classList.add('frequencia-mensal', 'dados-reais');
+                        setTimeout(() => {
+                            btnAtualizar.classList.remove('frequencia-mensal', 'dados-reais');
+                        }, 3000);
+                    }
+                    
+                } else {
+                    console.log(`ℹ️ Nenhum resultado novo. Último: ${ultimoConhecido}, API: ${novoNumero}`);
+                }
+            }
+            
+        } catch (error) {
+            console.warn('⚠️ Erro na verificação automática:', error.message);
+            // Não mostrar alerta para falhas silenciosas da verificação automática
+        }
+    }
+
+    // 🛑 Parar atualização automática (para economizar recursos se necessário)
+    pararAtualizacaoAutomatica() {
+        if (this.intervalAtualizacao) {
+            clearInterval(this.intervalAtualizacao);
+            this.intervalAtualizacao = null;
+            console.log('🛑 Atualização automática parada');
+        }
+        
+        // Ocultar indicador
+        const indicador = document.getElementById('indicadorAuto');
+        if (indicador) {
+            indicador.style.display = 'none';
+        }
+        
+        // Atualizar título do botão
+        const btnAtualizar = document.getElementById('atualizarResultado');
+        if (btnAtualizar) {
+            btnAtualizar.title = 'Buscar resultado manualmente (Ctrl+Click para reativar atualização automática)';
+        }
+    }
+
+    // 🔄 Alternar atualização automática (Ctrl+Click no botão)
+    alternarAtualizacaoAutomatica() {
+        if (this.intervalAtualizacao) {
+            this.pararAtualizacaoAutomatica();
+            this.mostrarAlerta('⏸️ Atualização automática desativada. Ctrl+Click no botão "Atualizar" para reativar.', 'info');
+        } else {
+            this.configurarAtualizacaoAutomatica();
+            this.mostrarAlerta('▶️ Atualização automática reativada! Monitorando resultados a cada 30 minutos.', 'success');
         }
     }
     
