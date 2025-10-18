@@ -3,7 +3,7 @@
 <div align="center">
 
 ![Status](https://img.shields.io/badge/Status-Ativo-green)
-![Versão](https://img.shields.io/badge/Versão-2.0.0-blue)
+![Versão](https://img.shields.io/badge/Versão-2.1.0-blue)
 ![Licença](https://img.shields.io/badge/Licença-MIT-yellow)
 
 **Uma ferramenta de apoio para estudos e estratégias da Lotofácil — simples, confiável e prática.**
@@ -22,11 +22,20 @@ O **LotoFácil Estratégica** é um site responsivo e inteligente que aplica est
 
 Fornecer uma ferramenta baseada em análises estatísticas reais da Lotofácil, ajudando jogadores a criar jogos mais estratégicos em vez de apenas aleatórios.
 
-### 🌟 Novidades da Versão 2.0
+### 🌟 Novidades da Versão 2.1.0
+
+- **✅ Sistema Otimizado**: Todas as 8 estratégias geram exatos 10 jogos únicos
+- **🐛 Bug Corrigido**: Estratégia 8 (Frequência Mensal) funcionando perfeitamente
+- **🗑️ Código Limpo**: 5 arquivos desnecessários removidos (1.674 linhas)
+- **📊 API Real**: Integração com `servicebus2.caixa.gov.br` mantida
+- **⚡ Performance**: Sistema de validação aprimorado
+- **🔄 Atualização Automática**: Monitoramento a cada 30 minutos
+
+### 🌟 Funcionalidades da Versão 2.0
 
 - **🆕 8ª Estratégia**: "Frequência Mensal" com dados oficiais da Caixa
 - **📊 API Real**: Integração com `servicebus2.caixa.gov.br`
-- **🎲 Mais Jogos**: Nova estratégia gera 10 jogos únicos
+- **🎲 Mais Jogos**: Todas as estratégias geram 10 jogos únicos
 - **⚡ Async/Await**: Performance aprimorada para operações assíncronas
 - **🔄 Fallback Inteligente**: Sistema de backup quando API estiver indisponível
 - **🎨 Interface Melhorada**: Nova cor teal para a estratégia especial
@@ -39,8 +48,8 @@ Para testar o site:
 
 1. Abra o arquivo `index.html` no seu navegador
 2. Insira o último resultado da Lotofácil (opcional)
-3. Escolha uma das 8 estratégias disponíveis (nova: Frequência Mensal!)
-4. Clique em "Gerar Jogos" e receba seus bilhetes otimizados (7 ou 10 jogos)
+3. Escolha uma das 8 estratégias disponíveis
+4. Clique em "Gerar Jogos" e receba seus bilhetes otimizados (10 jogos únicos)
 5. Copie, exporte ou regenere novos jogos conforme necessário
 
 ---
@@ -49,11 +58,11 @@ Para testar o site:
 
 ### ✨ Principais
 
-- **8 Estratégias Inteligentes**: Baseadas em padrões estatísticos reais (nova: Frequência Mensal com API oficial!)
+- **8 Estratégias Inteligentes**: Baseadas em padrões estatísticos reais (Frequência Mensal com API oficial!)
 - **Interface Responsiva**: Funciona perfeitamente em desktop, tablet e celular
 - **Geração Única**: Garante que os jogos nunca se repitam
 - **Integração API**: Busca dados oficiais da Caixa em tempo real
-- **Histórico Completo**: Acompanhe seus acertos e performance
+- **10 Jogos Únicos**: Todas as estratégias geram exatos 10 jogos únicos
 - **Design Moderno**: Interface clean e profissional
 
 ### 🛠️ Ferramentas

@@ -2,6 +2,38 @@
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
+## [2.1.0] - 17 de Outubro de 2025
+
+### 🎯 Sistema Completamente Otimizado
+
+#### ✅ Correções Críticas
+- **Estratégia 8 (Frequência Mensal)**: Corrigida para gerar exatos 10 jogos únicos
+- **Sistema de Validação**: Aprimorado para garantir integridade dos dados
+- **Performance**: Otimizada geração de jogos únicos
+
+#### 🗑️ Limpeza do Código
+Removidos **5 arquivos desnecessários**:
+- `analise-reversa.html` - Funcionalidade duplicada
+- `assets/js/analise-reversa.js` - Código duplicado
+- `test-functionality.html` - Arquivo de teste obsoleto
+- `teste-nova-estrategia.html` - Protótipo não utilizado
+- `ANALISE-REVERSA-README.md` - Documentação desnecessária
+
+#### 🔧 Melhorias Técnicas
+- **Todas as 8 estratégias** agora retornam exatos 10 jogos únicos
+- **API oficial da Caixa** integrada e funcionando
+- **Sistema de atualização automática** mantido (30 minutos)
+- **Interface responsiva** com TailwindCSS
+- **Código limpo** sem duplicatas
+
+#### 📊 Estatísticas de Otimização
+- **Redução de código**: 1.674 linhas removidas
+- **Arquivos removidos**: 5
+- **Bugs corrigidos**: 1 crítico (Estratégia 8)
+- **Performance**: Melhorada significativamente
+
+---
+
 ## [2.0.0] - 2024-12-25
 
 ### ✨ Adicionado
