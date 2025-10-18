@@ -330,12 +330,12 @@ class LotofacilEstrategica {
         const container = document.getElementById('numerosReferencia');
         if (container) {
             container.innerHTML = `
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                    <h3 class="text-lg font-bold text-blue-800 mb-2">
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6 text-center">
+                    <h3 class="text-lg font-bold text-blue-800 mb-2 text-center">
                         <i class="fas fa-star mr-2"></i>
                         Números de Referência (Últimos 150 Concursos)
                     </h3>
-                    <p class="text-blue-600 text-sm mb-3">
+                    <p class="text-blue-600 text-sm mb-4 text-center max-w-2xl mx-auto">
                         Os 9 números mais repetidos nos últimos 150 concursos - usados em todas as estratégias:
                     </p>
                     <div class="flex flex-wrap justify-center gap-2">
@@ -2252,44 +2252,81 @@ class LotofacilEstrategica {
                 // 2. Calcular frequência real dos números no período
                 const frequencia = this.calcularFrequenciaNumeros(resultadosRecentes);
                 
-                // 3. Método: 60% números mais frequentes + 40% balanceamento
+                // 3. Preparar números ordenados por frequência
                 const numerosOrdenados = [];
                 for (let i = 1; i <= 25; i++) {
                     numerosOrdenados.push({ numero: i, frequencia: frequencia[i] || 0 });
                 }
                 numerosOrdenados.sort((a, b) => b.frequencia - a.frequencia);
                 
-                const jogo = [];
+                // 4. Gerar 10 jogos únicos baseados na frequência
+                const jogos = [];
+                const jogosGerados = new Set();
                 
-                // 4. Selecionar 60% dos mais frequentes (9 números)
-                const numerosMaisFrequentes = numerosOrdenados.slice(0, 9).map(n => n.numero);
-                this.embaralharArray(numerosMaisFrequentes);
-                jogo.push(...numerosMaisFrequentes);
-                
-                // 5. Balanceamento com 40% restantes (6 números)
-                const numerosRestantes = numerosOrdenados.slice(9).map(n => n.numero);
-                this.embaralharArray(numerosRestantes);
-                
-                // Aplicar balanceamento par/ímpar nos números restantes  
-                const targetPares = Math.random() < 0.5 ? 7 : 8;
-                let paresNoJogo = jogo.filter(n => n % 2 === 0).length;
-                let imparesNoJogo = jogo.filter(n => n % 2 === 1).length;
-                
-                for (let num of numerosRestantes) {
-                    if (jogo.length >= 15) break;
+                while (jogos.length < 10) {
+                    const jogo = [];
                     
-                    const ehPar = num % 2 === 0;
-                    const precisaPar = paresNoJogo < targetPares;
-                    const precisaImpar = imparesNoJogo < (15 - targetPares);
+                    // 60% números mais frequentes (9 números)
+                    const numerosMaisFrequentes = numerosOrdenados.slice(0, 12).map(n => n.numero);
+                    this.embaralharArray(numerosMaisFrequentes);
+                    jogo.push(...numerosMaisFrequentes.slice(0, 9));
                     
-                    if ((ehPar && precisaPar) || (!ehPar && precisaImpar) || jogo.length >= 12) {
-                        jogo.push(num);
-                        if (ehPar) paresNoJogo++;
-                        else imparesNoJogo++;
+                    // 40% balanceamento (6 números restantes)
+                    const numerosRestantes = numerosOrdenados.slice(12).map(n => n.numero);
+                    this.embaralharArray(numerosRestantes);
+                    
+                    // Aplicar balanceamento par/ímpar
+                    const targetPares = Math.random() < 0.5 ? 7 : 8;
+                    let paresNoJogo = jogo.filter(n => n % 2 === 0).length;
+                    let imparesNoJogo = jogo.filter(n => n % 2 === 1).length;
+                    
+                    for (let num of numerosRestantes) {
+                        if (jogo.length >= 15) break;
+                        
+                        const ehPar = num % 2 === 0;
+                        const precisaPar = paresNoJogo < targetPares;
+                        const precisaImpar = imparesNoJogo < (15 - targetPares);
+                        
+                        if ((ehPar && precisaPar) || (!ehPar && precisaImpar) || jogo.length >= 12) {
+                            jogo.push(num);
+                            if (ehPar) paresNoJogo++;
+                            else imparesNoJogo++;
+                        }
                     }
+                    
+                    // Completar se necessário
+                    while (jogo.length < 15) {
+                        const numerosDisponiveis = [];
+                        for (let i = 1; i <= 25; i++) {
+                            if (!jogo.includes(i)) {
+                                numerosDisponiveis.push(i);
+                            }
+                        }
+                        if (numerosDisponiveis.length > 0) {
+                            this.embaralharArray(numerosDisponiveis);
+                            jogo.push(numerosDisponiveis[0]);
+                        } else {
+                            break;
+                        }
+                    }
+                    
+                    // Verificar unicidade
+                    const jogoStr = jogo.sort((a, b) => a - b).join(',');
+                    if (!jogosGerados.has(jogoStr) && jogo.length === 15) {
+                        jogosGerados.add(jogoStr);
+                        jogos.push(jogo.sort((a, b) => a - b));
+                    }
+                    
+                    // Evitar loop infinito
+                    if (jogosGerados.size > 1000) break;
                 }
                 
-                return jogo.sort((a, b) => a - b);
+                // Garantir que temos pelo menos 1 jogo válido
+                if (jogos.length === 0) {
+                    throw new Error('Não foi possível gerar jogos únicos');
+                }
+                
+                return jogos;
                 
             } else {
                 throw new Error('Dados da API não disponíveis');
@@ -2301,36 +2338,76 @@ class LotofacilEstrategica {
     }
     
     estrategiaFrequenciaMensalFallback() {
-        const jogo = [];
+        const jogos = [];
+        const jogosGerados = new Set();
         
-        // 1. Incluir TODOS os 9 números de referência (base sólida)
-        jogo.push(...this.numerosReferencia);
+        // Gerar 10 jogos únicos usando números de referência + estratégia combinada
+        while (jogos.length < 10) {
+            const jogo = [];
+            
+            // 1. Incluir números de referência (variando a quantidade: 6-9)
+            const numerosRef = [...this.numerosReferencia];
+            this.embaralharArray(numerosRef);
+            const quantidadeRef = 6 + Math.floor(Math.random() * 4); // 6-9 números
+            jogo.push(...numerosRef.slice(0, quantidadeRef));
+            
+            // 2. Aplicar critério combinado para completar
+            const numerosDisponiveis = [];
+            for (let i = 1; i <= 25; i++) {
+                if (!jogo.includes(i)) {
+                    numerosDisponiveis.push(i);
+                }
+            }
+            this.embaralharArray(numerosDisponiveis);
+            
+            // 3. Balanceamento par/ímpar para números restantes
+            const targetPares = Math.random() < 0.5 ? 7 : 8;
+            let paresNoJogo = jogo.filter(n => n % 2 === 0).length;
+            let imparesNoJogo = jogo.filter(n => n % 2 === 1).length;
+            
+            for (let num of numerosDisponiveis) {
+                if (jogo.length >= 15) break;
+                
+                const ehPar = num % 2 === 0;
+                const precisaPar = paresNoJogo < targetPares;
+                const precisaImpar = imparesNoJogo < (15 - targetPares);
+                
+                if ((ehPar && precisaPar) || (!ehPar && precisaImpar) || jogo.length >= 12) {
+                    jogo.push(num);
+                    if (ehPar) paresNoJogo++;
+                    else imparesNoJogo++;
+                }
+            }
+            
+            // 4. Completar se necessário
+            while (jogo.length < 15) {
+                const restantes = [];
+                for (let i = 1; i <= 25; i++) {
+                    if (!jogo.includes(i)) {
+                        restantes.push(i);
+                    }
+                }
+                if (restantes.length > 0) {
+                    this.embaralharArray(restantes);
+                    jogo.push(restantes[0]);
+                } else {
+                    break;
+                }
+            }
+            
+            // 5. Verificar unicidade
+            const jogoStr = jogo.sort((a, b) => a - b).join(',');
+            if (!jogosGerados.has(jogoStr) && jogo.length === 15) {
+                jogosGerados.add(jogoStr);
+                jogos.push(jogo.sort((a, b) => a - b));
+            }
+            
+            // Evitar loop infinito
+            if (jogosGerados.size > 1000) break;
+        }
         
-        // 2. Aplicar critério de divisão por colunas para os 6 restantes
-        const colunas = [
-            [1, 2, 3, 4, 5],      // Coluna 1
-            [6, 7, 8, 9, 10],     // Coluna 2
-            [11, 12, 13, 14, 15], // Coluna 3
-            [16, 17, 18, 19, 20], // Coluna 4
-            [21, 22, 23, 24, 25]  // Coluna 5
-        ];
-        
-        // Verificar distribuição atual por colunas
-        const numeroPorColuna = [0, 0, 0, 0, 0];
-        jogo.forEach(num => {
-            const coluna = Math.floor((num - 1) / 5);
-            numeroPorColuna[coluna]++;
-        });
-        
-        // Adicionar números das colunas menos representadas
-        const colunasOrdenadas = colunas.map((coluna, index) => ({
-            coluna,
-            index,
-            count: numeroPorColuna[index]
-        })).sort((a, b) => a.count - b.count);
-        
-        for (let { coluna, index } of colunasOrdenadas) {
-            if (jogo.length >= 15) break;
+        return jogos;
+    }
             
             const disponiveisNaColuna = coluna.filter(n => !jogo.includes(n));
             if (disponiveisNaColuna.length > 0 && numeroPorColuna[index] < 4) {
