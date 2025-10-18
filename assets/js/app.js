@@ -26,6 +26,19 @@ class LotofacilEstrategica {
                     this.statusPanel.toggle();
                 });
             }
+            
+            // Conectar botão de teste das estratégias
+            const testeButton = document.getElementById('testarEstrategias');
+            if (testeButton) {
+                testeButton.addEventListener('click', () => {
+                    this.testarTodasEstrategias();
+                });
+                
+                // Mostrar botão após carregamento
+                setTimeout(() => {
+                    testeButton.style.display = 'block';
+                }, 2000);
+            }
         }, 100);
         
         // Aguardar inicialização e sincronizar dados
@@ -487,6 +500,55 @@ class LotofacilEstrategica {
         });
         
         console.log('🎯 Total final de cards:', container.children.length);
+        
+        // Validação final
+        setTimeout(() => {
+            const totalFinal = container.children.length;
+            const cardsVisiveis = container.querySelectorAll('div.bg-white:not([style*="display: none"])').length;
+            
+            console.log(`📊 Status final: ${totalFinal} cards no DOM, ${cardsVisiveis} visíveis`);
+            
+            if (totalFinal === 10 && cardsVisiveis === 10) {
+                console.log('🎉 SUCESSO: Todas as 10 estratégias estão carregadas e visíveis!');
+                this.mostrarMensagemSucesso();
+            } else {
+                console.error(`❌ PROBLEMA: DOM=${totalFinal}, Visíveis=${cardsVisiveis}, Esperado=10`);
+                
+                // Listar quais estratégias estão faltando
+                const estrategiasVisiveis = Array.from(container.querySelectorAll('[data-strategy-id]'))
+                    .map(card => parseInt(card.getAttribute('data-strategy-id')))
+                    .sort((a, b) => a - b);
+                    
+                console.log('📋 Estratégias visíveis:', estrategiasVisiveis);
+                
+                const faltantes = [];
+                for (let i = 1; i <= 10; i++) {
+                    if (!estrategiasVisiveis.includes(i)) {
+                        faltantes.push(i);
+                    }
+                }
+                
+                if (faltantes.length > 0) {
+                    console.error('🚨 Estratégias FALTANTES:', faltantes);
+                }
+            }
+        }, 500);
+    }
+    
+    // 🎉 Mostrar mensagem de sucesso das 10 estratégias
+    mostrarMensagemSucesso() {
+        // Criar indicador visual discreto
+        const indicador = document.createElement('div');
+        indicador.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm';
+        indicador.innerHTML = '✅ 10 Estratégias Carregadas';
+        document.body.appendChild(indicador);
+        
+        // Remover após 3 segundos
+        setTimeout(() => {
+            if (indicador.parentNode) {
+                indicador.parentNode.removeChild(indicador);
+            }
+        }, 3000);
     }
     
     criarCardAnalise(analise) {
@@ -2865,6 +2927,95 @@ class LotofacilEstrategica {
         }
         
         return metodosAusentes.length === 0;
+    }
+    
+    // 🧪 Testar todas as estratégias
+    async testarTodasEstrategias() {
+        console.log('🧪 Iniciando teste de todas as estratégias...');
+        
+        const resultados = {
+            sucesso: [],
+            falha: []
+        };
+        
+        for (let i = 1; i <= 10; i++) {
+            try {
+                console.log(`🧪 Testando estratégia ${i}...`);
+                
+                // Simular geração de 1 jogo para teste
+                const jogos = await this.testarEstrategia(i);
+                
+                if (jogos && jogos.length > 0) {
+                    console.log(`✅ Estratégia ${i}: OK - ${jogos.length} jogos gerados`);
+                    resultados.sucesso.push(i);
+                } else {
+                    console.error(`❌ Estratégia ${i}: Falhou - Nenhum jogo gerado`);
+                    resultados.falha.push(i);
+                }
+                
+                // Aguardar um pouco entre testes
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+            } catch (error) {
+                console.error(`❌ Estratégia ${i}: Erro -`, error.message);
+                resultados.falha.push(i);
+            }
+        }
+        
+        // Relatório final
+        console.log('📊 RELATÓRIO DO TESTE:');
+        console.log(`✅ Estratégias funcionando: ${resultados.sucesso.length}/10`, resultados.sucesso);
+        console.log(`❌ Estratégias com problema: ${resultados.falha.length}/10`, resultados.falha);
+        
+        // Mostrar alerta visual
+        const sucesso = resultados.sucesso.length;
+        const total = 10;
+        
+        if (sucesso === total) {
+            this.mostrarAlerta(`🎉 Todas as ${total} estratégias estão funcionando perfeitamente!`, 'success');
+        } else {
+            this.mostrarAlerta(`⚠️ ${sucesso}/${total} estratégias funcionando. Problemas: ${resultados.falha.join(', ')}`, 'warning');
+        }
+        
+        return resultados;
+    }
+    
+    // 🧪 Testar uma estratégia específica
+    async testarEstrategia(id) {
+        // Simular geração com limite menor para teste
+        const jogosOriginais = this.jogosGerados;
+        this.jogosGerados = [];
+        
+        try {
+            // Gerar apenas 1 jogo para teste rápido
+            switch (id) {
+                case 1:
+                    return await this.estrategiaPoderepetidas();
+                case 2:
+                    return await this.estrategiaEquilibrioParImpar();
+                case 3:
+                    return await this.estrategiaNumerosAtrasados();
+                case 4:
+                    return await this.estrategiaSequenciasInteligentes();
+                case 5:
+                    return await this.estrategiaDivisaoColunas();
+                case 6:
+                    return await this.estrategiaFrequenciaHistorica();
+                case 7:
+                    return await this.estrategiaMatematicaFinais();
+                case 8:
+                    return await this.estrategiaFrequenciaMensal();
+                case 9:
+                    return await this.estrategiaTiraCinco();
+                case 10:
+                    return await this.estrategiaBingoCaixa();
+                default:
+                    throw new Error(`Estratégia ${id} não encontrada`);
+            }
+        } finally {
+            // Restaurar jogos originais
+            this.jogosGerados = jogosOriginais;
+        }
     }
     
     // Métodos auxiliares para Bingo da Caixa
