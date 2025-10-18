@@ -139,6 +139,9 @@ class LotofacilEstrategica {
     }
     
     init() {
+        console.log('🚀 Inicializando LotoFácil Estratégica...');
+        console.log('📊 Total de análises definidas:', this.analises.length);
+        
         this.carregarAnalises();
         this.configurarEventos();
         this.definirDataAtual();
@@ -149,6 +152,8 @@ class LotofacilEstrategica {
         this.inicializarNumerosReferencia();
         this.inicializarServiceWorker();
         this.configurarAtualizacaoAutomatica(); // Nova função para atualização automática
+        
+        console.log('✅ Inicialização concluída');
     }
     
     // 🚀 Inicializar sistema unificado de banco de dados
@@ -424,10 +429,15 @@ class LotofacilEstrategica {
         const container = document.getElementById('cardsAnalises');
         container.innerHTML = '';
         
-        this.analises.forEach(analise => {
+        console.log('📊 Carregando análises... Total:', this.analises.length);
+        
+        this.analises.forEach((analise, index) => {
+            console.log(`Carregando análise ${index + 1}: ${analise.titulo}`);
             const card = this.criarCardAnalise(analise);
             container.appendChild(card);
         });
+        
+        console.log('✅ Todas as análises carregadas no DOM');
     }
     
     criarCardAnalise(analise) {
@@ -1798,9 +1808,11 @@ class LotofacilEstrategica {
                         novoJogo = await this.estrategiaFrequenciaMensal();
                         break;
                     case 9:
+                        console.log('🎯 Executando Análise do Tira Cinco...');
                         novoJogo = await this.estrategiaTiraCinco();
                         break;
                     case 10:
+                        console.log('🎰 Executando Bingo da Caixa...');
                         novoJogo = await this.estrategiaBingoCaixa();
                         break;
                     default:
