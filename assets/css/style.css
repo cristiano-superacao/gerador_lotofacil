@@ -312,6 +312,52 @@
     .xl\:grid-cols-4 {
         grid-template-columns: repeat(4, minmax(0, 1fr));
     }
+    
+    .xl\:grid-cols-5 {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+}
+
+/* Forçar exibição de todas as 10 estratégias */
+#cardsAnalises {
+    display: grid !important;
+    grid-auto-rows: auto !important;
+    overflow: visible !important;
+    min-height: 800px !important;
+}
+
+#cardsAnalises > div {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: auto !important;
+    max-height: none !important;
+}
+
+/* Layout específico para as 10 estratégias */
+@media (min-width: 1280px) {
+    #cardsAnalises {
+        grid-template-columns: repeat(5, 1fr) !important;
+        grid-template-rows: repeat(2, auto) !important;
+    }
+}
+
+@media (max-width: 1279px) and (min-width: 1024px) {
+    #cardsAnalises {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+@media (max-width: 1023px) and (min-width: 768px) {
+    #cardsAnalises {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 767px) {
+    #cardsAnalises {
+        grid-template-columns: repeat(1, 1fr) !important;
+    }
 }
 
 /* Efeitos especiais para estratégias */

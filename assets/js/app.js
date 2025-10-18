@@ -458,8 +458,35 @@ class LotofacilEstrategica {
             
             if (totalCardsVisible !== 10) {
                 console.warn('⚠️ PROBLEMA: Esperado 10 cards, encontrado:', totalCardsVisible);
+                console.log('🔧 Tentando forçar criação das estratégias faltantes...');
+                this.forcarCriacaoEstrategiasFaltantes(container);
             }
         }, 1000);
+    }
+    
+    // 🔧 Método para forçar criação das estratégias faltantes
+    forcarCriacaoEstrategiasFaltantes(container) {
+        const cardsExistentes = container.querySelectorAll('[data-strategy-id]');
+        const idsExistentes = Array.from(cardsExistentes).map(card => 
+            parseInt(card.getAttribute('data-strategy-id'))
+        );
+        
+        console.log('📋 IDs existentes:', idsExistentes);
+        
+        this.analises.forEach(analise => {
+            if (!idsExistentes.includes(analise.id)) {
+                console.log(`🔧 Forçando criação da estratégia ${analise.id}: ${analise.titulo}`);
+                try {
+                    const card = this.criarCardAnalise(analise);
+                    container.appendChild(card);
+                    console.log(`✅ Estratégia ${analise.id} criada com sucesso`);
+                } catch (error) {
+                    console.error(`❌ Erro ao forçar criação da estratégia ${analise.id}:`, error);
+                }
+            }
+        });
+        
+        console.log('🎯 Total final de cards:', container.children.length);
     }
     
     criarCardAnalise(analise) {
