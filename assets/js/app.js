@@ -39,11 +39,6 @@ class LotofacilEstrategica {
                     testeButton.style.display = 'block';
                 }, 2000);
             }
-            
-            // Verificação adicional para estratégias 9 e 10
-            setTimeout(() => {
-                this.verificarEstrategias9e10();
-            }, 3000);
         }, 100);
         
         // Aguardar inicialização e sincronizar dados
@@ -51,11 +46,6 @@ class LotofacilEstrategica {
         
         // Verificar se todos os métodos das estratégias existem
         this.verificarMetodosEstrategias();
-        
-        // Força re-renderização das estratégias após carregamento completo
-        setTimeout(() => {
-            this.garantirTodasEstrategias();
-        }, 5000);
         
         // Definição das 10 análises estratégicas com integração API oficial da Caixa
         this.analises = [
@@ -561,80 +551,6 @@ class LotofacilEstrategica {
         }, 3000);
     }
     
-    // 🔍 Verificação específica para estratégias 9 e 10
-    verificarEstrategias9e10() {
-        const container = document.getElementById('cardsAnalises');
-        const estrategia9 = container.querySelector('[data-strategy-id="9"]');
-        const estrategia10 = container.querySelector('[data-strategy-id="10"]');
-        
-        console.log('🔍 Verificando estratégias 9 e 10...');
-        console.log('📊 Estratégia 9 (Tira Cinco):', estrategia9 ? 'ENCONTRADA' : 'FALTANTE');
-        console.log('📊 Estratégia 10 (Bingo da Caixa):', estrategia10 ? 'ENCONTRADA' : 'FALTANTE');
-        
-        if (!estrategia9) {
-            console.log('🔧 Forçando criação da estratégia 9...');
-            const analise9 = this.analises.find(a => a.id === 9);
-            if (analise9) {
-                const card9 = this.criarCardAnalise(analise9);
-                container.appendChild(card9);
-                console.log('✅ Estratégia 9 criada e adicionada!');
-            }
-        }
-        
-        if (!estrategia10) {
-            console.log('🔧 Forçando criação da estratégia 10...');
-            const analise10 = this.analises.find(a => a.id === 10);
-            if (analise10) {
-                const card10 = this.criarCardAnalise(analise10);
-                container.appendChild(card10);
-                console.log('✅ Estratégia 10 criada e adicionada!');
-            }
-        }
-        
-        // Verificação final
-        setTimeout(() => {
-            const totalCards = container.children.length;
-            console.log(`📊 Total de cards após verificação: ${totalCards}/10`);
-            
-            if (totalCards === 10) {
-                console.log('🎉 SUCESSO: Todas as 10 estratégias estão visíveis!');
-            } else {
-                console.warn('⚠️ Ainda há estratégias faltantes:', 10 - totalCards);
-            }
-        }, 1000);
-    }
-
-    // 🎯 Garantir que todas as 10 estratégias estejam visíveis
-    garantirTodasEstrategias() {
-        const container = document.getElementById('cardsAnalises');
-        const cardsAtual = container.children.length;
-        
-        console.log(`🎯 Verificação final: ${cardsAtual}/10 estratégias carregadas`);
-        
-        if (cardsAtual < 10) {
-            console.log('🔄 Re-carregando todas as estratégias...');
-            
-            // Limpar container
-            container.innerHTML = '';
-            
-            // Recriar todas as estratégias
-            this.analises.forEach((analise, index) => {
-                console.log(`📊 [${index + 1}/10] Recriando: ${analise.titulo}`);
-                try {
-                    const card = this.criarCardAnalise(analise);
-                    container.appendChild(card);
-                    console.log(`✅ Estratégia ${analise.id} recriada com sucesso`);
-                } catch (error) {
-                    console.error(`❌ Erro ao recriar estratégia ${analise.id}:`, error);
-                }
-            });
-            
-            console.log(`🎉 Recriação concluída: ${container.children.length}/10 estratégias`);
-        } else {
-            console.log('✅ Todas as 10 estratégias já estão visíveis!');
-        }
-    }
-
     criarCardAnalise(analise) {
         console.log('🎨 Criando card para estratégia:', analise.id, '-', analise.titulo);
         
