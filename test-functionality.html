@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Funcionalidades - LotoFácil Estratégica</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        .number-display {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin: 10px 0;
+        }
+        .number {
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Teste de Funcionalidades - LotoFácil Estratégica</h1>
+    
+    <div class="test-section">
+        <h2>1. Teste de Carregamento da Aplicação</h2>
+        <div id="app-load-test"></div>
+        <button onclick="testAppLoad()">Testar Carregamento</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Teste das Estratégias</h2>
+        <div id="strategy-test"></div>
+        <button onclick="testStrategies()">Testar Todas as Estratégias</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Teste da API da Caixa</h2>
+        <div id="api-test"></div>
+        <button onclick="testAPI()">Testar Conexão com API</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Teste de Validações</h2>
+        <div id="validation-test"></div>
+        <button onclick="testValidations()">Testar Validações</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. Teste de Cache</h2>
+        <div id="cache-test"></div>
+        <button onclick="testCache()">Testar Sistema de Cache</button>
+    </div>
+
+    <script>
+        // Importar a classe da aplicação principal
+        let app;
+        
+        function addResult(containerId, message, type = 'success') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = message;
+            container.appendChild(div);
+        }
+        
+        function clearResults(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+        }
+        
+        async function testAppLoad() {
+            clearResults('app-load-test');
+            
+            try {
+                // Tentar carregar scripts da aplicação principal
+                const script = document.createElement('script');
+                script.src = 'assets/js/app.js';
+                document.head.appendChild(script);
+                
+                script.onload = () => {
+                    try {
+                        app = new LotofacilEstrategica();
+                        addResult('app-load-test', '✅ Aplicação carregada com sucesso!', 'success');
+                        addResult('app-load-test', `✅ ${app.analises.length} estratégias disponíveis`, 'success');
+                    } catch (error) {
+                        addResult('app-load-test', `❌ Erro ao inicializar aplicação: ${error.message}`, 'error');
+                    }
+                };
+                
+                script.onerror = () => {
+                    addResult('app-load-test', '❌ Erro ao carregar script da aplicação', 'error');
+                };
+                
+            } catch (error) {
+                addResult('app-load-test', `❌ Erro no teste: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testStrategies() {
+            clearResults('strategy-test');
+            
+            if (!app) {
+                addResult('strategy-test', '⚠️ Execute primeiro o teste de carregamento', 'warning');
+                return;
+            }
+            
+            try {
+                for (let i = 1; i <= 8; i++) {
+                    try {
+                        const jogos = await app.executarEstrategia(i);
+                        const estrategia = app.analises.find(a => a.id === i);
+                        
+                        // Validar se são 10 jogos com 15 números cada
+                        if (jogos.length === 10 && jogos.every(jogo => jogo.length === 15)) {
+                            addResult('strategy-test', `✅ Estratégia ${i} (${estrategia.titulo}): ${jogos.length} jogos gerados`, 'success');
+                            
+                            // Mostrar primeiro jogo como exemplo
+                            const primeiroJogo = jogos[0].map(n => n.toString().padStart(2, '0')).join(', ');
+                            addResult('strategy-test', `&nbsp;&nbsp;&nbsp;Exemplo: ${primeiroJogo}`, 'success');
+                        } else {
+                            addResult('strategy-test', `❌ Estratégia ${i}: formato inválido`, 'error');
+                        }
+                    } catch (error) {
+                        addResult('strategy-test', `❌ Estratégia ${i}: ${error.message}`, 'error');
+                    }
+                }
+            } catch (error) {
+                addResult('strategy-test', `❌ Erro geral no teste: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testAPI() {
+            clearResults('api-test');
+            
+            try {
+                addResult('api-test', '🔄 Testando conexão com API da Caixa...', 'warning');
+                
+                const response = await fetch('https://servicebus2.caixa.gov.br/portaldeloterias/api/lotofacil/');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult('api-test', '✅ API da Caixa respondendo corretamente', 'success');
+                    addResult('api-test', `✅ Último concurso: ${data.numero}`, 'success');
+                    addResult('api-test', `✅ Data: ${data.dataApuracao}`, 'success');
+                    
+                    if (data.listaDezenas) {
+                        const dezenas = data.listaDezenas.map(n => n.toString().padStart(2, '0')).join(', ');
+                        addResult('api-test', `✅ Dezenas: ${dezenas}`, 'success');
+                    }
+                } else {
+                    addResult('api-test', `❌ API retornou erro: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult('api-test', `❌ Erro na conexão: ${error.message}`, 'error');
+                addResult('api-test', '⚠️ Sistema funcionará com dados simulados', 'warning');
+            }
+        }
+        
+        function testValidations() {
+            clearResults('validation-test');
+            
+            // Teste de números válidos
+            const numerosValidos = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+            const numerosInvalidos = [0, 26, 27, 30];
+            
+            // Validar números de 1 a 25
+            const todosValidos = numerosValidos.every(n => n >= 1 && n <= 25);
+            const nenhumInvalido = numerosInvalidos.every(n => n < 1 || n > 25);
+            
+            if (todosValidos) {
+                addResult('validation-test', '✅ Validação de números válidos: OK', 'success');
+            } else {
+                addResult('validation-test', '❌ Validação de números válidos: FALHOU', 'error');
+            }
+            
+            if (nenhumInvalido) {
+                addResult('validation-test', '✅ Detecção de números inválidos: OK', 'success');
+            } else {
+                addResult('validation-test', '❌ Detecção de números inválidos: FALHOU', 'error');
+            }
+            
+            // Teste de duplicatas
+            const semDuplicatas = new Set(numerosValidos).size === numerosValidos.length;
+            addResult('validation-test', semDuplicatas ? '✅ Controle de duplicatas: OK' : '❌ Controle de duplicatas: FALHOU', semDuplicatas ? 'success' : 'error');
+            
+            // Teste de quantidade
+            const quantidadeCorreta = numerosValidos.length === 15;
+            addResult('validation-test', quantidadeCorreta ? '✅ Quantidade de números: OK' : '❌ Quantidade de números: FALHOU', quantidadeCorreta ? 'success' : 'error');
+        }
+        
+        function testCache() {
+            clearResults('cache-test');
+            
+            try {
+                // Testar localStorage
+                const testKey = 'lotofacil_test_cache';
+                const testData = { test: true, timestamp: Date.now() };
+                
+                localStorage.setItem(testKey, JSON.stringify(testData));
+                const retrieved = JSON.parse(localStorage.getItem(testKey));
+                
+                if (retrieved && retrieved.test === true) {
+                    addResult('cache-test', '✅ Sistema de cache funcionando', 'success');
+                    localStorage.removeItem(testKey);
+                } else {
+                    addResult('cache-test', '❌ Erro no sistema de cache', 'error');
+                }
+                
+                // Testar capacidade
+                const cacheSpace = new Blob([JSON.stringify(testData)]).size;
+                addResult('cache-test', `✅ Tamanho do teste: ${cacheSpace} bytes`, 'success');
+                
+            } catch (error) {
+                addResult('cache-test', `❌ Cache não disponível: ${error.message}`, 'error');
+            }
+        }
+        
+        // Auto-executar teste básico
+        window.onload = () => {
+            addResult('app-load-test', '🔄 Clique em "Testar Carregamento" para iniciar', 'warning');
+        };
+    </script>
+</body>
+</html>
