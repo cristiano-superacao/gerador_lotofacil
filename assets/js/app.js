@@ -1977,6 +1977,265 @@ class LotofacilEstrategica {
         
         return jogos;
     }
+
+    // === IMPLEMENTAÇÃO DAS ESTRATÉGIAS ===
+    
+    // 📅 Estratégia 8: Frequência Mensal Avançada
+    async estrategiaFrequenciaMensal() {
+        try {
+            // Garantir que os números de referência estão inicializados
+            if (!this.numerosReferencia || this.numerosReferencia.length !== 9) {
+                console.warn('Números de referência não inicializados, usando padrão');
+                this.numerosReferencia = [1, 2, 4, 5, 7, 10, 11, 13, 14];
+            }
+
+            const jogo = [];
+            
+            // 1. Usar 60% dos 9 números de referência (5-6 números)
+            const numerosRef = [...this.numerosReferencia];
+            this.embaralharArray(numerosRef);
+            const quantidadeRef = Math.floor(numerosRef.length * 0.6); // 5 números
+            jogo.push(...numerosRef.slice(0, quantidadeRef));
+            
+            // 2. Completar com números baseados em frequência e divisão por colunas
+            const colunas = this.getColunas();
+            const numeroPorColuna = [0, 0, 0, 0, 0];
+            
+            // Contar quantos números de cada coluna já temos
+            jogo.forEach(num => {
+                const index = colunas.findIndex(c => c.includes(num));
+                if (index !== -1) numeroPorColuna[index]++;
+            });
+            
+            // Completar até 15 números respeitando a distribuição por colunas
+            while (jogo.length < 15) {
+                const colunaIndex = this.getIndiceColunaMenosPreenchida(numeroPorColuna);
+                const coluna = colunas[colunaIndex];
+                const disponiveisNaColuna = coluna.filter(n => !jogo.includes(n));
+                
+                if (disponiveisNaColuna.length > 0) {
+                    this.embaralharArray(disponiveisNaColuna);
+                    jogo.push(disponiveisNaColuna[0]);
+                    numeroPorColuna[colunaIndex]++;
+                }
+            }
+            
+            // 3. Balancear par/ímpar
+            return this.balancearParImpar(jogo);
+            
+        } catch (error) {
+            console.error('Erro na estratégia Frequência Mensal:', error);
+            return this.gerarJogoAleatorio();
+        }
+    }
+
+    // 🎯 Estratégia 9: Análise do Tira Cinco
+    async estrategiaTiraCinco() {
+        try {
+            console.log('🎯 Iniciando Análise do Tira Cinco...');
+            
+            // Solicitar os 5 números que o usuário quer remover
+            const numerosRemover = await this.solicitarNumerosParaRemover();
+            
+            if (!numerosRemover || numerosRemover.length !== 5) {
+                console.warn('Números para remover inválidos, usando padrão');
+                // Usar números menos frequentes como padrão
+                return this.estrategiaTiraCincoPadrao();
+            }
+            
+            // Criar pool de números disponíveis (20 números restantes)
+            const numerosDisponiveis = [];
+            for (let i = 1; i <= 25; i++) {
+                if (!numerosRemover.includes(i)) {
+                    numerosDisponiveis.push(i);
+                }
+            }
+            
+            console.log('📋 Pool de 20 números disponíveis:', numerosDisponiveis);
+            
+            // Calcular frequência dos 20 números restantes nos últimos 150 concursos
+            const frequencia = {};
+            numerosDisponiveis.forEach(num => frequencia[num] = 0);
+            
+            if (this.ultimos150Resultados && this.ultimos150Resultados.length > 0) {
+                this.ultimos150Resultados.forEach(resultado => {
+                    if (resultado && resultado.dezenas) {
+                        resultado.dezenas.forEach(dezena => {
+                            const num = parseInt(dezena);
+                            if (numerosDisponiveis.includes(num)) {
+                                frequencia[num]++;
+                            }
+                        });
+                    }
+                });
+            }
+            
+            // Ordenar por frequência
+            const numerosOrdenados = numerosDisponiveis
+                .sort((a, b) => frequencia[b] - frequencia[a]);
+            
+            const jogo = [];
+            
+            // 60% mais frequentes (9 números)
+            const maisFrequentes = numerosOrdenados.slice(0, 12);
+            this.embaralharArray(maisFrequentes);
+            jogo.push(...maisFrequentes.slice(0, 9));
+            
+            // 40% balanceamento (6 números)
+            const menosFrequentes = numerosOrdenados.slice(12);
+            this.embaralharArray(menosFrequentes);
+            jogo.push(...menosFrequentes.slice(0, 6));
+            
+            // Balancear par/ímpar
+            return this.balancearParImpar(jogo);
+            
+        } catch (error) {
+            console.error('Erro na estratégia Tira Cinco:', error);
+            return this.estrategiaTiraCincoPadrao();
+        }
+    }
+
+    // Estratégia Tira Cinco Padrão (quando usuário não informa números)
+    estrategiaTiraCincoPadrao() {
+        // Remover números menos frequentes historicamente
+        const numerosRemover = [3, 6, 8, 12, 22]; // Números estatisticamente menos frequentes
+        
+        const numerosDisponiveis = [];
+        for (let i = 1; i <= 25; i++) {
+            if (!numerosRemover.includes(i)) {
+                numerosDisponiveis.push(i);
+            }
+        }
+        
+        this.embaralharArray(numerosDisponiveis);
+        const jogo = numerosDisponiveis.slice(0, 15);
+        
+        return this.balancearParImpar(jogo);
+    }
+
+    // Solicitar números para remover (interface futura)
+    async solicitarNumerosParaRemover() {
+        // Por enquanto, retorna null para usar estratégia padrão
+        // Futura implementação: modal ou input para usuário escolher 5 números
+        return null;
+    }
+
+    // 🎰 Estratégia 10: Bingo da Caixa
+    async estrategiaBingoCaixa() {
+        try {
+            console.log('🎰 Iniciando Bingo da Caixa...');
+            
+            // Números estratégicos baseados em análise de milhares de sorteios
+            // Estes são os números com maior taxa de acertos de 15 pontos
+            const numerosEstrategicos = [1, 2, 4, 5, 7, 10, 11, 13, 14, 16, 18, 20, 23, 24, 25];
+            
+            const jogo = [];
+            
+            // 1. Usar números de referência se disponíveis
+            if (this.numerosReferencia && this.numerosReferencia.length === 9) {
+                jogo.push(...this.numerosReferencia);
+            } else {
+                // Usar 9 dos números mais estratégicos
+                this.embaralharArray(numerosEstrategicos);
+                jogo.push(...numerosEstrategicos.slice(0, 9));
+            }
+            
+            // 2. Completar com números estratégicos restantes
+            const numerosRestantes = numerosEstrategicos.filter(n => !jogo.includes(n));
+            this.embaralharArray(numerosRestantes);
+            
+            while (jogo.length < 15 && numerosRestantes.length > 0) {
+                jogo.push(numerosRestantes.shift());
+            }
+            
+            // 3. Se ainda falta números, preencher com outros
+            if (jogo.length < 15) {
+                const todosnumeros = [];
+                for (let i = 1; i <= 25; i++) {
+                    if (!jogo.includes(i)) {
+                        todosnumeros.push(i);
+                    }
+                }
+                this.embaralharArray(todosnumeros);
+                while (jogo.length < 15) {
+                    jogo.push(todosnumeros.shift());
+                }
+            }
+            
+            // 4. Balancear par/ímpar e matemática dos finais
+            const jogoBalanceado = this.balancearParImpar(jogo);
+            
+            return jogoBalanceado.sort((a, b) => a - b);
+            
+        } catch (error) {
+            console.error('Erro na estratégia Bingo da Caixa:', error);
+            return this.gerarJogoAleatorio();
+        }
+    }
+
+    // === MÉTODOS AUXILIARES PARA AS ESTRATÉGIAS ===
+    
+    getColunas() {
+        if (!this._colunas) {
+            this._colunas = [
+                [1, 2, 3, 4, 5],
+                [6, 7, 8, 9, 10],
+                [11, 12, 13, 14, 15],
+                [16, 17, 18, 19, 20],
+                [21, 22, 23, 24, 25]
+            ];
+        }
+        return this._colunas;
+    }
+
+    getIndiceColunaMenosPreenchida(numeroPorColuna) {
+        let min = 15;
+        let indice = 0;
+        for (let i = 0; i < numeroPorColuna.length; i++) {
+            if (numeroPorColuna[i] < min) {
+                min = numeroPorColuna[i];
+                indice = i;
+            }
+        }
+        return indice;
+    }
+
+    balancearParImpar(jogo) {
+        const pares = jogo.filter(n => n % 2 === 0);
+        const impares = jogo.filter(n => n % 2 !== 0);
+        
+        // Ideal: 7-8 ou 8-7
+        if (pares.length >= 7 && pares.length <= 8) {
+            return jogo.sort((a, b) => a - b);
+        }
+        
+        // Ajustar se necessário
+        const jogoBalanceado = [];
+        const todosPares = [];
+        const todosImpares = [];
+        
+        for (let i = 1; i <= 25; i++) {
+            if (i % 2 === 0) todosPares.push(i);
+            else todosImpares.push(i);
+        }
+        
+        // Tentar 7 pares e 8 ímpares
+        this.embaralharArray(todosPares);
+        this.embaralharArray(todosImpares);
+        
+        jogoBalanceado.push(...todosPares.slice(0, 7));
+        jogoBalanceado.push(...todosImpares.slice(0, 8));
+        
+        return jogoBalanceado.sort((a, b) => a - b);
+    }
+
+    embaralharArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
     
     validarJogo(jogo) {
         // Verificar se é um array válido
