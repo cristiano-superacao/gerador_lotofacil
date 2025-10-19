@@ -18,6 +18,7 @@ class LotofacilEstrategica {
         // 📊 Inicializar painel de status do sistema
         this.statusPanel = new SystemStatusPanel(this.dbManager, this.strategyManager);
         
+        /* Botões flutuantes removidos - código mantido para referência
         // Conectar botão do painel de status
         setTimeout(() => {
             const statusButton = document.getElementById('statusPanelToggle');
@@ -40,6 +41,7 @@ class LotofacilEstrategica {
                 }, 2000);
             }
         }, 100);
+        */
         
         // Aguardar inicialização e sincronizar dados
         this.inicializarSistema();
