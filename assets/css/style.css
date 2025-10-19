@@ -343,17 +343,16 @@
     z-index: 1 !important;
 }
 
-/* Layout específico para as 10 estratégias */
-@media (min-width: 1280px) {
+/* Layout específico para as 10 estratégias em 2x5 */
+@media (min-width: 1024px) {
     #cardsAnalises {
         grid-template-columns: repeat(5, 1fr) !important;
         grid-template-rows: repeat(2, auto) !important;
+        max-width: 100%;
     }
-}
-
-@media (max-width: 1279px) and (min-width: 1024px) {
-    #cardsAnalises {
-        grid-template-columns: repeat(3, 1fr) !important;
+    
+    #cardsAnalises > div {
+        min-height: 350px;
     }
 }
 
