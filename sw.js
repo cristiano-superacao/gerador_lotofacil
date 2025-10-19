@@ -1,9 +1,10 @@
 // Service Worker para LotoFácil Estratégica
-// Versão: 2.0.0
+// Versão: 2.1.1 - Sistema automático de cache-busting
 
-const CACHE_NAME = 'lotofacil-estrategica-v2.0.0';
-const STATIC_CACHE = 'static-v2.0.0';
-const API_CACHE = 'api-v2.0.0';
+const APP_VERSION = '2.1.1';
+const CACHE_NAME = `lotofacil-estrategica-v${APP_VERSION}`;
+const STATIC_CACHE = `static-v${APP_VERSION}`;
+const API_CACHE = `api-v${APP_VERSION}`;
 
 // Arquivos essenciais para cache
 const ESSENTIAL_FILES = [

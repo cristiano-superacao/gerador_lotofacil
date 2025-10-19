@@ -2,7 +2,7 @@
   "name": "LotoFácil Estratégica",
   "short_name": "LotoFácil",
   "description": "Ferramenta inteligente para gerar jogos da Lotofácil baseados em estatísticas e estratégias comprovadas",
-  "version": "2.0.0",
+  "version": "2.1.1",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait-primary",

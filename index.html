@@ -21,6 +21,11 @@
     <meta name="keywords" content="lotofacil, estrategias, estatisticas, jogos, analises, numeros">
     <meta name="author" content="LotoFácil Estratégica">
     
+    <!-- Cache Control - Forçar revalidação -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <!-- PWA e SEO -->
     <meta name="theme-color" content="#667eea">
     <link rel="manifest" href="manifest.json">
@@ -374,9 +379,49 @@
     <!-- JavaScript principal -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="assets/js/database-manager.js"></script>
-    <script src="assets/js/system-status.js"></script>
-    <script src="assets/js/app.js"></script>
+    <script src="firebase-config.js?v=2.1.1"></script>
+    <script src="assets/js/database-manager.js?v=2.1.1"></script>
+    <script src="assets/js/system-status.js?v=2.1.1"></script>
+    <script src="assets/js/app.js?v=2.1.1"></script>
+    
+    <!-- Cache Buster Script -->
+    <script>
+        // Limpar cache automaticamente em atualizações
+        const APP_VERSION = '2.1.1';
+        const CACHE_KEY = 'lotofacil-version';
+        
+        // Verificar se houve atualização
+        const cachedVersion = localStorage.getItem(CACHE_KEY);
+        if (cachedVersion !== APP_VERSION) {
+            console.log('🔄 Nova versão detectada! Limpando cache...');
+            
+            // Limpar localStorage (exceto dados importantes)
+            const savedGames = localStorage.getItem('savedGames');
+            const jogosGerados = localStorage.getItem('jogosGerados');
+            const conferencias = localStorage.getItem('conferencias');
+            
+            localStorage.clear();
+            
+            // Restaurar dados importantes
+            if (savedGames) localStorage.setItem('savedGames', savedGames);
+            if (jogosGerados) localStorage.setItem('jogosGerados', jogosGerados);
+            if (conferencias) localStorage.setItem('conferencias', conferencias);
+            
+            // Atualizar versão
+            localStorage.setItem(CACHE_KEY, APP_VERSION);
+            
+            // Limpar cache do service worker
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => {
+                        console.log('🗑️ Removendo cache:', name);
+                        caches.delete(name);
+                    });
+                });
+            }
+            
+            console.log('✅ Cache limpo! Versão atual:', APP_VERSION);
+        }
+    </script>
 </body>
 </html>
