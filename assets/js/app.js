@@ -11,12 +11,10 @@ class LotofacilEstrategica {
         this.ultimos150Resultados = [];
         this.numerosReferencia = [];
         
-        // 🗄️ Inicializar sistema unificado de banco de dados
-        this.dbManager = new DatabaseManager();
-        this.strategyManager = new StrategyManager(this.dbManager);
-        
-        // 📊 Inicializar painel de status do sistema
-        this.statusPanel = new SystemStatusPanel(this.dbManager, this.strategyManager);
+    // 🗄️ Inicializar sistema unificado de banco de dados
+    this.dbManager = new DatabaseManager();
+    // Removido: this.strategyManager = new StrategyManager(this.dbManager);
+    // Removido: this.statusPanel = new SystemStatusPanel(this.dbManager, this.strategyManager);
         
         /* Botões flutuantes removidos - código mantido para referência
         // Conectar botão do painel de status
@@ -44,13 +42,8 @@ class LotofacilEstrategica {
         */
         
         // Aguardar inicialização e sincronizar dados
-        this.inicializarSistema();
-        
-        // Verificar se todos os métodos das estratégias existem
-        this.verificarMetodosEstrategias();
-        
-        // Definição das 10 análises estratégicas com integração API oficial da Caixa
-        this.analises = [
+    // Inicialização direta (sem dependências quebradas)
+    this.analises = [
             {
                 id: 1,
                 titulo: "🔄 Poder das Repetidas",
@@ -153,7 +146,7 @@ class LotofacilEstrategica {
             }
         ];
         
-        this.init();
+    this.init();
     }
     
     init() {
@@ -184,13 +177,6 @@ class LotofacilEstrategica {
             
             // Sincronizar dados
             await this.dbManager.sincronizar();
-            
-            // Carregar histórico de jogos
-            const historico = await this.strategyManager.carregarHistorico();
-            if (historico.length > 0) {
-                console.log(`📋 ${historico.length} jogos anteriores carregados`);
-            }
-            
             // Limpar dados antigos (30 dias)
             await this.dbManager.limparDadosAntigos(30);
             
