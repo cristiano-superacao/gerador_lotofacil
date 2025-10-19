@@ -446,45 +446,32 @@ class LotofacilEstrategica {
     carregarAnalises() {
         const container = document.getElementById('cardsAnalises');
         container.innerHTML = '';
-        
-        console.log('📊 Carregando análises... Total:', this.analises.length);
-        
-        console.log('📋 Total de estratégias definidas:', this.analises.length);
-        console.log('📋 Estratégias:', this.analises.map(a => `${a.id}: ${a.titulo}`));
-        
-        // FORÇA: Garantir que TODAS as 10 estratégias sejam renderizadas
-        if (this.analises.length !== 10) {
-            console.error('⚠️ ERRO CRÍTICO: Esperado 10 estratégias, mas encontrado:', this.analises.length);
-        }
-        
+
+        // Garantir que sempre renderize 10 cards
+        let cardsRenderizados = 0;
         this.analises.forEach((analise, index) => {
-            console.log(`📊 [${index + 1}/${this.analises.length}] Carregando estratégia:`, analise.id, '-', analise.titulo);
-            
             try {
                 const card = this.criarCardAnalise(analise);
                 container.appendChild(card);
-                console.log(`✅ Card ${analise.id} adicionado com sucesso`);
+                cardsRenderizados++;
             } catch (error) {
                 console.error(`❌ Erro ao criar card ${analise.id}:`, error);
             }
         });
-        
-        console.log('✅ Carregamento concluído - Total de cards no DOM:', container.children.length);
-        
-        // Verificação adicional OBRIGATÓRIA
-        setTimeout(() => {
-            const totalCardsVisible = container.querySelectorAll('div.bg-white').length;
-            console.log('👀 Cards visíveis após timeout:', totalCardsVisible);
-            
-            if (totalCardsVisible !== 10) {
-                console.warn('⚠️ PROBLEMA: Esperado 10 cards, encontrado:', totalCardsVisible);
-                console.log('🔧 Forçando criação das estratégias faltantes...');
-                this.forcarCriacaoEstrategiasFaltantes(container);
-            } else {
-                console.log('✅ Todas as 10 estratégias carregadas corretamente!');
-                this.mostrarMensagemSucesso();
-            }
-        }, 1000);
+
+        // Se não renderizou todos, mostrar mensagem de erro visual
+        if (cardsRenderizados !== 10) {
+            const erro = document.createElement('div');
+            erro.className = 'col-span-5 text-center text-red-600 font-bold text-lg py-8';
+            erro.innerHTML = `⚠️ Erro ao carregar as estratégias. Renderizados: ${cardsRenderizados}/10. Tente atualizar a página.`;
+            container.appendChild(erro);
+        }
+        // Garantir grid sempre visível
+        container.style.minHeight = '400px';
+        container.style.display = 'grid';
+        container.style.gridTemplateColumns = 'repeat(5, minmax(0, 1fr))';
+        container.style.gap = '1.5rem';
+    }
     }
     
     // 🔧 Método para forçar criação das estratégias faltantes
