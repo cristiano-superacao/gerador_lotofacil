@@ -450,6 +450,11 @@ class LotofacilEstrategica {
         console.log('📋 Total de estratégias definidas:', this.analises.length);
         console.log('📋 Estratégias:', this.analises.map(a => `${a.id}: ${a.titulo}`));
         
+        // FORÇA: Garantir que TODAS as 10 estratégias sejam renderizadas
+        if (this.analises.length !== 10) {
+            console.error('⚠️ ERRO CRÍTICO: Esperado 10 estratégias, mas encontrado:', this.analises.length);
+        }
+        
         this.analises.forEach((analise, index) => {
             console.log(`📊 [${index + 1}/${this.analises.length}] Carregando estratégia:`, analise.id, '-', analise.titulo);
             
@@ -464,15 +469,18 @@ class LotofacilEstrategica {
         
         console.log('✅ Carregamento concluído - Total de cards no DOM:', container.children.length);
         
-        // Verificação adicional
+        // Verificação adicional OBRIGATÓRIA
         setTimeout(() => {
             const totalCardsVisible = container.querySelectorAll('div.bg-white').length;
             console.log('👀 Cards visíveis após timeout:', totalCardsVisible);
             
             if (totalCardsVisible !== 10) {
                 console.warn('⚠️ PROBLEMA: Esperado 10 cards, encontrado:', totalCardsVisible);
-                console.log('🔧 Tentando forçar criação das estratégias faltantes...');
+                console.log('🔧 Forçando criação das estratégias faltantes...');
                 this.forcarCriacaoEstrategiasFaltantes(container);
+            } else {
+                console.log('✅ Todas as 10 estratégias carregadas corretamente!');
+                this.mostrarMensagemSucesso();
             }
         }, 1000);
     }
