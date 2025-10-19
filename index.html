@@ -407,5 +407,138 @@
             console.log('✅ Cache limpo! Versão atual:', APP_VERSION);
         }
     </script>
+    
+    <!-- PWA Install Prompt -->
+    <script>
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('✅ Service Worker registrado com sucesso:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.error('❌ Erro ao registrar Service Worker:', error);
+                    });
+            });
+        }
+
+        // Variável para armazenar o evento de instalação
+        let deferredPrompt;
+        let installButton;
+
+        // Detectar quando o navegador está pronto para instalar
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('🎯 PWA pode ser instalado!');
+            
+            // Prevenir o prompt automático do Chrome
+            e.preventDefault();
+            
+            // Armazenar o evento para usar depois
+            deferredPrompt = e;
+            
+            // Mostrar botão de instalação customizado
+            showInstallButton();
+        });
+
+        // Criar e mostrar botão de instalação
+        function showInstallButton() {
+            // Verificar se já existe o botão
+            if (document.getElementById('pwa-install-button')) {
+                return;
+            }
+
+            // Criar botão flutuante de instalação
+            installButton = document.createElement('button');
+            installButton.id = 'pwa-install-button';
+            installButton.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-download"></i>
+                    <span class="hidden sm:inline">Instalar App</span>
+                </div>
+            `;
+            installButton.className = 'fixed bottom-4 right-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 z-50 font-semibold';
+            
+            // Adicionar ao body
+            document.body.appendChild(installButton);
+            
+            // Animar entrada
+            setTimeout(() => {
+                installButton.style.animation = 'bounce 1s ease-in-out 3';
+            }, 500);
+            
+            // Adicionar evento de clique
+            installButton.addEventListener('click', installPWA);
+        }
+
+        // Função para instalar o PWA
+        async function installPWA() {
+            if (!deferredPrompt) {
+                console.log('❌ Prompt de instalação não disponível');
+                return;
+            }
+
+            // Mostrar o prompt de instalação
+            deferredPrompt.prompt();
+            
+            // Aguardar a escolha do usuário
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            console.log(`👤 Usuário ${outcome === 'accepted' ? 'aceitou' : 'recusou'} a instalação`);
+            
+            // Limpar o prompt
+            deferredPrompt = null;
+            
+            // Remover o botão
+            if (installButton) {
+                installButton.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => {
+                    installButton.remove();
+                }, 300);
+            }
+        }
+
+        // Detectar quando o app foi instalado
+        window.addEventListener('appinstalled', () => {
+            console.log('✅ PWA instalado com sucesso!');
+            
+            // Remover o botão se ainda estiver visível
+            if (installButton) {
+                installButton.remove();
+            }
+            
+            // Mostrar mensagem de sucesso
+            if (window.mostrarNotificacao) {
+                window.mostrarNotificacao('App instalado com sucesso! 🎉', 'success');
+            }
+        });
+
+        // Adicionar animações CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+            
+            @keyframes fadeOut {
+                from { opacity: 1; transform: scale(1); }
+                to { opacity: 0; transform: scale(0.8); }
+            }
+            
+            #pwa-install-button {
+                transition: all 0.3s ease;
+            }
+            
+            #pwa-install-button:hover {
+                transform: scale(1.05) !important;
+            }
+            
+            #pwa-install-button:active {
+                transform: scale(0.95) !important;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 </html>
