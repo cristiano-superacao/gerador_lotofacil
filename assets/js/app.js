@@ -531,34 +531,20 @@ class LotofacilEstrategica {
             if (indicador.parentNode) {
                 indicador.parentNode.removeChild(indicador);
             }
-        }, 3000);
-    }
-    
-    criarCardAnalise(analise) {
-        console.log('🎨 Criando card para estratégia:', analise.id, '-', analise.titulo);
-        
-        const card = document.createElement('div');
-        card.className = 'bg-white rounded-lg card-shadow p-6 cursor-pointer transform transition-all duration-300 hover:scale-105';
-        card.setAttribute('data-strategy-id', analise.id);
-        
-        // Definir número de jogos: 10 para todas as estratégias
-        const numeroJogos = 10;
-        
-        card.innerHTML = `
-            <div class="text-center mb-4">
-                <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-r ${analise.cor} flex items-center justify-center text-white text-2xl mb-3">
-                    <i class="${analise.icon}"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2">${analise.titulo}</h3>
-                <p class="text-gray-600 text-sm mb-4">${analise.descricao}</p>
-            </div>
-            
-            <div class="space-y-3">
-                <button class="w-full bg-gradient-to-r ${analise.cor} text-white py-3 px-6 rounded-lg font-semibold hover:opacity-90 transition-opacity" 
-                        onclick="lotofacil.gerarJogos(${analise.id})">
-                    <i class="fas fa-magic mr-2"></i>
-                    Gerar ${numeroJogos} Jogos
-                </button>
+        try {
+            this.mostrarLoading(true, 'Analisando últimos 150 concursos...');
+            // Buscar os últimos 150 resultados
+            this.ultimos150Resultados = await this.buscarUltimos150Resultados();
+            // Calcular os 9 números mais repetidos
+            this.numerosReferencia = this.calcular9NumerosMaisRepetidos();
+        } catch (error) {
+            console.warn('Erro ao inicializar números de referência:', error);
+            // Usar números de referência padrão baseados em estatísticas históricas (em ordem crescente)
+            this.numerosReferencia = [1, 2, 4, 5, 7, 10, 11, 13, 14];
+        }
+        // SEMPRE atualizar interface, mesmo se for fallback
+        this.atualizarInterfaceNumerosReferencia();
+        this.mostrarLoading(false);
                 
                 <button class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-lg text-sm hover:bg-gray-50 transition-colors"
                         onclick="lotofacil.mostrarDetalhes(${analise.id})">
