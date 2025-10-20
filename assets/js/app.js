@@ -547,12 +547,12 @@ class LotofacilEstrategica {
         const container = document.getElementById('numerosReferencia');
         if (container) {
             container.innerHTML = `
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                    <h3 class="text-lg font-bold text-blue-800 mb-2">
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6 text-center">
+                    <h3 class="text-lg font-bold text-blue-800 mb-2 flex items-center justify-center">
                         <i class="fas fa-star mr-2"></i>
                         Números de Referência (Últimos 150 Concursos)
                     </h3>
-                    <p class="text-blue-600 text-sm mb-3">
+                    <p class="text-blue-600 text-sm mb-4 mx-auto max-w-2xl">
                         Os 9 números mais repetidos nos últimos 150 concursos - usados em todas as estratégias:
                     </p>
                     <div class="flex flex-wrap justify-center gap-2">
