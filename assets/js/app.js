@@ -105,7 +105,7 @@ class LotofacilEstrategica {
         this.carregarHistorico();
         this.atualizarEstatisticas();
         this.recuperarUltimoResultado();
-        this.buscarUltimoResultadoAutomatico();
+        // Remover chamada duplicada - será feita no iniciarAtualizacaoAutomatica
         this.inicializarNumerosReferencia();
         this.inicializarServiceWorker();
         this.iniciarAtualizacaoAutomatica();
@@ -114,27 +114,29 @@ class LotofacilEstrategica {
     // === ATUALIZAÇÃO AUTOMÁTICA PERIÓDICA ===
     
     iniciarAtualizacaoAutomatica() {
-        // Buscar resultado ao carregar a página
         console.log('🔄 Sistema de atualização automática iniciado');
-        console.log('📡 Verificações automáticas a cada 5 minutos');
+        console.log('📡 API: https://servicebus2.caixa.gov.br/portaldeloterias/api/lotofacil/');
+        console.log('🌐 Referência: https://loterias.caixa.gov.br/Paginas/Lotofacil.aspx');
         
-        // SEMPRE buscar resultado ao iniciar, ignorando cache inicial
-        console.log('🚀 Buscando último resultado da API da Caixa ao iniciar...');
+        // SEMPRE buscar resultado ao iniciar
+        console.log('🚀 Buscando último resultado oficial da Caixa...');
+        
+        // Buscar imediatamente após elementos estarem carregados
         setTimeout(() => {
             this.buscarUltimoResultadoAutomatico();
-        }, 1000); // Aguardar 1 segundo para garantir que a página carregou
+        }, 500); // Reduzir para 500ms
         
-        // Configurar atualização automática a cada 5 minutos
+        // Configurar atualização automática a cada 3 minutos (mais frequente)
         setInterval(() => {
             const now = new Date().toLocaleTimeString('pt-BR');
-            console.log(`🔍 [${now}] Verificando atualização automática do resultado...`);
+            console.log(`🔍 [${now}] Verificando atualização automática...`);
             this.buscarUltimoResultadoAutomaticoSilencioso();
-        }, 5 * 60 * 1000); // 5 minutos
+        }, 3 * 60 * 1000); // 3 minutos
         
         // Adicionar animação no indicador AUTO
         const indicadorAuto = document.getElementById('indicadorAuto');
         if (indicadorAuto) {
-            indicadorAuto.title = 'Atualização automática ativa (a cada 5 minutos)';
+            indicadorAuto.title = 'Atualização automática ativa (a cada 3 minutos)';
         }
     }
     
@@ -763,9 +765,13 @@ class LotofacilEstrategica {
         const maxRetries = 3;
         let lastError;
         
+        console.log('🎯 Iniciando busca do último resultado...');
+        
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
                 this.mostrarLoading(true, attempt === 1 ? 'Buscando último resultado da Caixa...' : `Tentativa ${attempt}/${maxRetries}...`);
+                
+                console.log(`📡 Tentativa ${attempt}: Conectando à API da Caixa...`);
                 
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos
@@ -781,11 +787,14 @@ class LotofacilEstrategica {
                 
                 clearTimeout(timeoutId);
                 
+                console.log(`✅ Resposta recebida - Status: ${response.status}`);
+                
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
                 const data = await response.json();
+                console.log('📦 Dados recebidos:', { concurso: data.numero, data: data.dataApuracao });
                 
                 // Validação rigorosa dos dados recebidos
                 if (!this.validarDadosAPI(data)) {
@@ -799,6 +808,8 @@ class LotofacilEstrategica {
                     dezenas: data.listaDezenas.map(n => n.toString().padStart(2, '0')).sort((a, b) => parseInt(a) - parseInt(b))
                 };
                 
+                console.log('💾 Salvando resultado:', this.ultimoResultado);
+                
                 // Atualizar campos do formulário
                 document.getElementById('concurso').value = data.numero;
                 document.getElementById('dataConcurso').value = this.converterDataParaInput(data.dataApuracao);
@@ -810,7 +821,10 @@ class LotofacilEstrategica {
                 
                 this.exibirUltimoResultado();
                 this.atualizarResultadosHistorico(false); // Atualizar sem mostrar alerta
-                this.mostrarAlerta('Último resultado atualizado automaticamente pela Caixa!', 'success');
+                
+                console.log('🎉 Último resultado atualizado com sucesso!');
+                this.mostrarAlerta(`✅ Concurso ${data.numero} atualizado automaticamente!`, 'success');
+                
                 return; // Sucesso, sair do loop
                 
             } catch (error) {
