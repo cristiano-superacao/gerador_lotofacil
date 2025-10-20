@@ -1644,7 +1644,6 @@ class LotofacilEstrategica {
             this.jogosGerados = await Promise.race([jogosPromise, timeoutPromise]);
             
             this.exibirJogosGerados(analise.titulo);
-            this.mostrarLoading(false);
             
             // Scroll para resultados
             document.getElementById('resultados').scrollIntoView({ 
@@ -1653,7 +1652,10 @@ class LotofacilEstrategica {
             });
         } catch (error) {
             console.error('Erro ao gerar jogos:', error);
+            console.error('Erro ao gerar jogos:', error);
             this.mostrarAlerta('Erro ao gerar jogos: ' + error.message, 'error');
+        } finally {
+            // SEMPRE remover loading, mesmo em caso de erro
             this.mostrarLoading(false);
         }
     }
