@@ -251,7 +251,7 @@ class LotofacilEstrategica {
         if ('serviceWorker' in navigator) {
             try {
                 const registration = await navigator.serviceWorker.register('/sw.js');
-                console.log('Service Worker registrado com sucesso:', registration);
+                console.log('✅ Service Worker registrado com sucesso:', registration);
                 
                 // Verificar se há atualizações
                 registration.addEventListener('updatefound', () => {
@@ -269,10 +269,119 @@ class LotofacilEstrategica {
                     this.mostrarAlerta('Nova versão disponível! Recarregue a página para atualizar.', 'info');
                 }
                 
+                // Inicializar prompt de instalação PWA
+                this.inicializarPWAInstall();
+                
             } catch (error) {
-                console.warn('Service Worker registration failed:', error);
+                console.warn('⚠️ Service Worker registration failed:', error);
             }
         }
+    }
+    
+    // === PWA INSTALL PROMPT ===
+    
+    inicializarPWAInstall() {
+        let deferredPrompt;
+        
+        // Capturar o evento beforeinstallprompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('📱 PWA pode ser instalado');
+            // Prevenir o prompt padrão
+            e.preventDefault();
+            // Guardar o evento para usar depois
+            deferredPrompt = e;
+            
+            // Mostrar banner de instalação personalizado
+            this.mostrarBannerInstalacao(deferredPrompt);
+        });
+        
+        // Detectar quando o app foi instalado
+        window.addEventListener('appinstalled', () => {
+            console.log('✅ PWA instalado com sucesso!');
+            this.mostrarAlerta('📱 App instalado com sucesso! Acesse pelo ícone na tela inicial', 'success');
+            deferredPrompt = null;
+        });
+        
+        // Verificar se já está instalado
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            console.log('✅ App já está instalado e rodando em modo standalone');
+        }
+    }
+    
+    mostrarBannerInstalacao(deferredPrompt) {
+        // Verificar se o usuário já rejeitou o banner antes
+        const bannerRejeitado = localStorage.getItem('pwa_install_rejected');
+        if (bannerRejeitado) {
+            const rejectedTime = parseInt(bannerRejeitado);
+            const daysSinceRejection = (Date.now() - rejectedTime) / (1000 * 60 * 60 * 24);
+            if (daysSinceRejection < 7) {
+                console.log('⏳ Banner de instalação rejeitado recentemente');
+                return;
+            }
+        }
+        
+        // Criar banner personalizado
+        const banner = document.createElement('div');
+        banner.id = 'pwa-install-banner';
+        banner.className = 'fixed bottom-0 left-0 right-0 bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4 shadow-2xl z-50 transform translate-y-full transition-transform duration-500';
+        banner.innerHTML = `
+            <div class="container mx-auto flex items-center justify-between flex-wrap gap-3">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-white text-purple-600 rounded-full p-2">
+                        <i class="fas fa-mobile-alt text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg">Instalar LotoFácil Estratégica</h3>
+                        <p class="text-sm text-purple-100">Use offline e acesse direto da tela inicial!</p>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button id="pwa-install-btn" class="bg-white text-purple-600 px-6 py-2 rounded-lg font-bold hover:bg-purple-50 transition-colors">
+                        <i class="fas fa-download mr-2"></i>
+                        Instalar
+                    </button>
+                    <button id="pwa-dismiss-btn" class="text-white hover:text-purple-200 px-4">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(banner);
+        
+        // Animar entrada
+        setTimeout(() => {
+            banner.classList.remove('translate-y-full');
+        }, 500);
+        
+        // Botão de instalação
+        document.getElementById('pwa-install-btn').addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            
+            // Mostrar o prompt de instalação
+            deferredPrompt.prompt();
+            
+            // Aguardar resposta do usuário
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`👤 Usuário ${outcome === 'accepted' ? 'aceitou' : 'recusou'} instalar o PWA`);
+            
+            if (outcome === 'dismissed') {
+                localStorage.setItem('pwa_install_rejected', Date.now().toString());
+            }
+            
+            // Remover banner
+            banner.classList.add('translate-y-full');
+            setTimeout(() => banner.remove(), 500);
+            
+            deferredPrompt = null;
+        });
+        
+        // Botão de fechar
+        document.getElementById('pwa-dismiss-btn').addEventListener('click', () => {
+            localStorage.setItem('pwa_install_rejected', Date.now().toString());
+            banner.classList.add('translate-y-full');
+            setTimeout(() => banner.remove(), 500);
+        });
     }
     
     // === NOVA FUNCIONALIDADE: NÚMEROS DE REFERÊNCIA ===
@@ -1515,27 +1624,38 @@ class LotofacilEstrategica {
             return;
         }
         
-        // Mostrar loading com mensagem específica para estratégia 8
-        const mensagem = idAnalise === 8 ? 'Analisando frequência mensal...' : 'Gerando jogos...';
+        // Mostrar loading com mensagem específica
+        const mensagens = {
+            8: 'Analisando frequência mensal...',
+            9: 'Analisando últimos 5 meses...',
+            10: 'Calculando melhor assertividade...'
+        };
+        const mensagem = mensagens[idAnalise] || 'Gerando jogos inteligentes...';
         this.mostrarLoading(true, mensagem);
         
-        // Simular processamento (remover em produção)
-        setTimeout(async () => {
-            try {
-                this.jogosGerados = await this.executarEstrategia(idAnalise);
-                this.exibirJogosGerados(analise.titulo);
-                this.mostrarLoading(false);
-                
-                // Scroll para resultados
-                document.getElementById('resultados').scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'center'
-                });
-            } catch (error) {
-                this.mostrarAlerta('Erro ao gerar jogos: ' + error.message, 'error');
-                this.mostrarLoading(false);
-            }
-        }, 1500);
+        try {
+            // Executar estratégia com timeout de segurança
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Timeout: Operação demorou muito')), 30000)
+            );
+            
+            const jogosPromise = this.executarEstrategia(idAnalise);
+            
+            this.jogosGerados = await Promise.race([jogosPromise, timeoutPromise]);
+            
+            this.exibirJogosGerados(analise.titulo);
+            this.mostrarLoading(false);
+            
+            // Scroll para resultados
+            document.getElementById('resultados').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'center'
+            });
+        } catch (error) {
+            console.error('Erro ao gerar jogos:', error);
+            this.mostrarAlerta('Erro ao gerar jogos: ' + error.message, 'error');
+            this.mostrarLoading(false);
+        }
     }
     
     async executarEstrategia(idAnalise) {
