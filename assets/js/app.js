@@ -2158,99 +2158,73 @@ class LotofacilEstrategica {
         return jogo.sort((a, b) => a - b);
     }
     
-    // Estratégia 8: Sistema Avançado Completo (Otimizado)
+    // Estratégia 8: Frequência Mensal (Simplificada e Otimizada)
     async estrategiaFrequenciaMensal() {
-        // Usar dados já carregados nos últimos 150 resultados
-        if (this.ultimos150Resultados && this.ultimos150Resultados.length >= 20) {
-            try {
-                const resultadosRecentes = this.ultimos150Resultados.slice(0, 20);
-                const frequencia = this.calcularFrequenciaNumeros(resultadosRecentes);
-                const jogoComDados = this.gerarJogoComFrequencia(frequencia);
-                console.log('✅ Usando dados já carregados para estratégia 8');
-                return jogoComDados;
-            } catch (error) {
-                console.warn('⚠️ Erro ao processar dados, usando fallback:', error.message);
-            }
-        }
-        
-        // Fallback: usar números de referência + sistema avançado
-        return this.estrategiaFrequenciaMensalFallback();
-    }
-    
-    estrategiaFrequenciaMensalFallback() {
         const jogo = [];
         
-        // 1. Incluir TODOS os 9 números de referência (base sólida)
-        jogo.push(...this.numerosReferencia);
+        // 1. Usar dados já carregados para calcular frequência
+        const frequencia = {};
+        for (let i = 1; i <= 25; i++) frequencia[i] = 0;
         
-        // 2. Aplicar critério de divisão por colunas para os 6 restantes
+        // Contar frequência nos últimos resultados disponíveis
+        if (this.ultimos150Resultados && this.ultimos150Resultados.length > 0) {
+            const resultadosRecentes = this.ultimos150Resultados.slice(0, Math.min(20, this.ultimos150Resultados.length));
+            resultadosRecentes.forEach(resultado => {
+                if (resultado && resultado.dezenas) {
+                    resultado.dezenas.forEach(num => {
+                        const numero = parseInt(num);
+                        if (numero >= 1 && numero <= 25) {
+                            frequencia[numero]++;
+                        }
+                    });
+                }
+            });
+        }
+        
+        // 2. Separar em mais frequentes (60%) e outros (40%)
+        const ordenados = Object.entries(frequencia)
+            .map(([num, freq]) => ({ numero: parseInt(num), frequencia: freq }))
+            .sort((a, b) => b.frequencia - a.frequencia);
+        
+        // Pegar 60% dos mais frequentes (9 números)
+        const maisFrequentes = ordenados.slice(0, 9).map(item => item.numero);
+        this.embaralharArray(maisFrequentes);
+        jogo.push(...maisFrequentes.slice(0, 9));
+        
+        // 3. Completar com números balanceados por coluna (40% = 6 números)
         const colunas = [
-            [1, 2, 3, 4, 5],      // Coluna 1
-            [6, 7, 8, 9, 10],     // Coluna 2
-            [11, 12, 13, 14, 15], // Coluna 3
-            [16, 17, 18, 19, 20], // Coluna 4
-            [21, 22, 23, 24, 25]  // Coluna 5
+            [1, 2, 3, 4, 5],
+            [6, 7, 8, 9, 10],
+            [11, 12, 13, 14, 15],
+            [16, 17, 18, 19, 20],
+            [21, 22, 23, 24, 25]
         ];
         
-        // Verificar distribuição atual por colunas
+        // Verificar distribuição por colunas
         const numeroPorColuna = [0, 0, 0, 0, 0];
         jogo.forEach(num => {
             const coluna = Math.floor((num - 1) / 5);
             numeroPorColuna[coluna]++;
         });
         
-        // Adicionar números das colunas menos representadas
-        const colunasOrdenadas = colunas.map((coluna, index) => ({
-            coluna,
-            index,
-            count: numeroPorColuna[index]
-        })).sort((a, b) => a.count - b.count);
-        
-        for (let { coluna, index } of colunasOrdenadas) {
-            if (jogo.length >= 15) break;
-            
-            const disponiveisNaColuna = coluna.filter(n => !jogo.includes(n));
-            if (disponiveisNaColuna.length > 0 && numeroPorColuna[index] < 4) {
-                this.embaralharArray(disponiveisNaColuna);
-                jogo.push(disponiveisNaColuna[0]);
-                numeroPorColuna[index]++;
-            }
+        // Completar com números das colunas menos representadas
+        const numerosDisponiveis = [];
+        for (let i = 1; i <= 25; i++) {
+            if (!jogo.includes(i)) numerosDisponiveis.push(i);
         }
         
-        // 3. Aplicar matemática dos finais para os números finais
-        const finaisNoJogo = {};
-        jogo.forEach(num => {
-            const final = num % 10;
-            finaisNoJogo[final] = (finaisNoJogo[final] || 0) + 1;
+        // Ordenar por coluna menos representada
+        numerosDisponiveis.sort((a, b) => {
+            const colunaA = Math.floor((a - 1) / 5);
+            const colunaB = Math.floor((b - 1) / 5);
+            return numeroPorColuna[colunaA] - numeroPorColuna[colunaB];
         });
         
-        // Completar balanceando finais
-        while (jogo.length < 15) {
-            let numeroAdicionado = false;
-            
-            // Procurar número que equilibre os finais
-            for (let i = 1; i <= 25; i++) {
-                if (!jogo.includes(i)) {
-                    const final = i % 10;
-                    if ((finaisNoJogo[final] || 0) < 2) {
-                        jogo.push(i);
-                        finaisNoJogo[final] = (finaisNoJogo[final] || 0) + 1;
-                        numeroAdicionado = true;
-                        break;
-                    }
-                }
-            }
-            
-            // Se não encontrou balanceando finais, adicionar qualquer um
-            if (!numeroAdicionado) {
-                for (let i = 1; i <= 25; i++) {
-                    if (!jogo.includes(i)) {
-                        jogo.push(i);
-                        break;
-                    }
-                }
-            }
-        }
+        // Adicionar 6 números para completar 15
+        jogo.push(...numerosDisponiveis.slice(0, 6));
+        
+        console.log('✅ Frequência Mensal: Usando dados dos últimos', 
+            this.ultimos150Resultados?.length || 0, 'resultados');
         
         return jogo.sort((a, b) => a - b);
     }
