@@ -118,18 +118,11 @@ class LotofacilEstrategica {
         console.log('🔄 Sistema de atualização automática iniciado');
         console.log('📡 Verificações automáticas a cada 5 minutos');
         
-        // Verificar se há resultado em cache e se está desatualizado
-        const cachedTime = localStorage.getItem('ultimo_resultado_automatico_time');
-        const cacheAge = cachedTime ? Date.now() - parseInt(cachedTime) : Infinity;
-        const cacheMaxAge = 5 * 60 * 1000; // 5 minutos
-        
-        if (cacheAge > cacheMaxAge) {
-            console.log('⏰ Cache desatualizado (>5min), buscando novo resultado da API da Caixa...');
+        // SEMPRE buscar resultado ao iniciar, ignorando cache inicial
+        console.log('🚀 Buscando último resultado da API da Caixa ao iniciar...');
+        setTimeout(() => {
             this.buscarUltimoResultadoAutomatico();
-        } else {
-            const minutosRestantes = Math.floor((cacheMaxAge - cacheAge) / 60000);
-            console.log(`✅ Cache ainda válido. Próxima verificação em ~${minutosRestantes} minutos`);
-        }
+        }, 1000); // Aguardar 1 segundo para garantir que a página carregou
         
         // Configurar atualização automática a cada 5 minutos
         setInterval(() => {
@@ -2165,26 +2158,23 @@ class LotofacilEstrategica {
         return jogo.sort((a, b) => a - b);
     }
     
-    // Estratégia 8: Sistema Avançado Completo com Fallback Inteligente
+    // Estratégia 8: Sistema Avançado Completo (Otimizado)
     async estrategiaFrequenciaMensal() {
-        try {
-            // Tentar buscar dados oficiais primeiro
-            const resultadosRecentes = await this.buscarResultadosRecentes();
-            
-            if (resultadosRecentes && resultadosRecentes.length > 0) {
-                // Usar dados reais da API
+        // Usar dados já carregados nos últimos 150 resultados
+        if (this.ultimos150Resultados && this.ultimos150Resultados.length >= 20) {
+            try {
+                const resultadosRecentes = this.ultimos150Resultados.slice(0, 20);
                 const frequencia = this.calcularFrequenciaNumeros(resultadosRecentes);
-                const jogoComDadosReais = this.gerarJogoComFrequencia(frequencia);
-                console.log('Usando dados oficiais da API para estratégia 8');
-                return jogoComDadosReais;
-            } else {
-                throw new Error('API indisponível');
+                const jogoComDados = this.gerarJogoComFrequencia(frequencia);
+                console.log('✅ Usando dados já carregados para estratégia 8');
+                return jogoComDados;
+            } catch (error) {
+                console.warn('⚠️ Erro ao processar dados, usando fallback:', error.message);
             }
-        } catch (error) {
-            console.warn('Usando fallback para estratégia 8:', error.message);
-            // Fallback: usar números de referência + sistema avançado
-            return this.estrategiaFrequenciaMensalFallback();
         }
+        
+        // Fallback: usar números de referência + sistema avançado
+        return this.estrategiaFrequenciaMensalFallback();
     }
     
     estrategiaFrequenciaMensalFallback() {
