@@ -1652,7 +1652,6 @@ class LotofacilEstrategica {
             });
         } catch (error) {
             console.error('Erro ao gerar jogos:', error);
-            console.error('Erro ao gerar jogos:', error);
             this.mostrarAlerta('Erro ao gerar jogos: ' + error.message, 'error');
         } finally {
             // SEMPRE remover loading, mesmo em caso de erro
