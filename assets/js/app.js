@@ -108,6 +108,120 @@ class LotofacilEstrategica {
         this.buscarUltimoResultadoAutomatico();
         this.inicializarNumerosReferencia();
         this.inicializarServiceWorker();
+        this.iniciarAtualizacaoAutomatica();
+    }
+    
+    // === ATUALIZAÇÃO AUTOMÁTICA PERIÓDICA ===
+    
+    iniciarAtualizacaoAutomatica() {
+        // Buscar resultado ao carregar a página
+        console.log('🔄 Sistema de atualização automática iniciado');
+        console.log('📡 Verificações automáticas a cada 5 minutos');
+        
+        // Verificar se há resultado em cache e se está desatualizado
+        const cachedTime = localStorage.getItem('ultimo_resultado_automatico_time');
+        const cacheAge = cachedTime ? Date.now() - parseInt(cachedTime) : Infinity;
+        const cacheMaxAge = 5 * 60 * 1000; // 5 minutos
+        
+        if (cacheAge > cacheMaxAge) {
+            console.log('⏰ Cache desatualizado (>5min), buscando novo resultado da API da Caixa...');
+            this.buscarUltimoResultadoAutomatico();
+        } else {
+            const minutosRestantes = Math.floor((cacheMaxAge - cacheAge) / 60000);
+            console.log(`✅ Cache ainda válido. Próxima verificação em ~${minutosRestantes} minutos`);
+        }
+        
+        // Configurar atualização automática a cada 5 minutos
+        setInterval(() => {
+            const now = new Date().toLocaleTimeString('pt-BR');
+            console.log(`🔍 [${now}] Verificando atualização automática do resultado...`);
+            this.buscarUltimoResultadoAutomaticoSilencioso();
+        }, 5 * 60 * 1000); // 5 minutos
+        
+        // Adicionar animação no indicador AUTO
+        const indicadorAuto = document.getElementById('indicadorAuto');
+        if (indicadorAuto) {
+            indicadorAuto.title = 'Atualização automática ativa (a cada 5 minutos)';
+        }
+    }
+    
+    async buscarUltimoResultadoAutomaticoSilencioso() {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
+            
+            const response = await fetch('https://servicebus2.caixa.gov.br/portaldeloterias/api/lotofacil/', {
+                signal: controller.signal,
+                headers: {
+                    'Accept': 'application/json',
+                    'Cache-Control': 'no-cache'
+                }
+            });
+            
+            clearTimeout(timeoutId);
+            
+            if (!response.ok) {
+                console.warn('API retornou erro:', response.status);
+                return;
+            }
+            
+            const data = await response.json();
+            
+            if (!this.validarDadosAPI(data)) {
+                console.warn('Dados da API inválidos');
+                return;
+            }
+            
+            // Verificar se é um resultado novo
+            const concursoAtual = this.ultimoResultado?.concurso;
+            const concursoNovo = parseInt(data.numero);
+            
+            if (concursoAtual && concursoNovo <= concursoAtual) {
+                console.log('Sem novos resultados');
+                return;
+            }
+            
+            // Processar novo resultado
+            this.ultimoResultado = {
+                concurso: concursoNovo,
+                data: this.formatarDataBrasil(data.dataApuracao),
+                dezenas: data.listaDezenas.map(n => n.toString().padStart(2, '0')).sort((a, b) => parseInt(a) - parseInt(b))
+            };
+            
+            // Atualizar campos do formulário
+            document.getElementById('concurso').value = data.numero;
+            document.getElementById('dataConcurso').value = this.converterDataParaInput(data.dataApuracao);
+            document.getElementById('dezenasUltimoResultado').value = data.listaDezenas.map(n => n.toString().padStart(2, '0')).join(',');
+            
+            // Salvar no localStorage
+            localStorage.setItem('ultimo_resultado_automatico', JSON.stringify(this.ultimoResultado));
+            localStorage.setItem('ultimo_resultado_automatico_time', Date.now().toString());
+            
+            this.exibirUltimoResultado();
+            this.atualizarResultadosHistorico(false);
+            
+            // Atualizar números de referência com o novo resultado
+            await this.inicializarNumerosReferencia();
+            
+            // Mostrar alerta apenas se for um resultado novo
+            if (concursoAtual) {
+                this.mostrarAlerta(`🎉 Novo resultado! Concurso ${concursoNovo} atualizado automaticamente`, 'success');
+                
+                // Adicionar efeito visual no botão de atualizar
+                const btnAtualizar = document.getElementById('atualizarResultado');
+                if (btnAtualizar) {
+                    btnAtualizar.classList.add('ring-4', 'ring-green-300');
+                    setTimeout(() => {
+                        btnAtualizar.classList.remove('ring-4', 'ring-green-300');
+                    }, 3000);
+                }
+            }
+            
+            console.log('✅ Resultado atualizado automaticamente:', concursoNovo);
+            
+        } catch (error) {
+            console.warn('⚠️ Erro na atualização automática silenciosa:', error.message);
+        }
     }
     
     recuperarUltimoResultado() {
