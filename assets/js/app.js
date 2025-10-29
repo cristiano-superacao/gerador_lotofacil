@@ -121,6 +121,9 @@ class LotofacilEstrategica {
         // SEMPRE buscar resultado ao iniciar
         console.log('🚀 Buscando último resultado oficial da Caixa...');
         
+        // Mostrar notificação ao usuário que o sistema está buscando automaticamente
+        this.mostrarAlerta('🔄 Buscando último resultado da Lotofácil automaticamente...', 'info');
+        
         // Buscar imediatamente após elementos estarem carregados
         setTimeout(() => {
             this.buscarUltimoResultadoAutomatico();
@@ -188,6 +191,9 @@ class LotofacilEstrategica {
             document.getElementById('dataConcurso').value = this.converterDataParaInput(data.dataApuracao);
             document.getElementById('dezenasUltimoResultado').value = data.listaDezenas.map(n => n.toString().padStart(2, '0')).join(',');
             
+            // Adicionar feedback visual de que os dados foram preenchidos automaticamente
+            this.addVisualFeedbackToFields();
+            
             // Salvar no localStorage
             localStorage.setItem('ultimo_resultado_automatico', JSON.stringify(this.ultimoResultado));
             localStorage.setItem('ultimo_resultado_automatico_time', Date.now().toString());
@@ -200,7 +206,7 @@ class LotofacilEstrategica {
             
             // Mostrar alerta apenas se for um resultado novo
             if (concursoAtual) {
-                this.mostrarAlerta(`🎉 Novo resultado! Concurso ${concursoNovo} atualizado automaticamente`, 'success');
+                this.mostrarAlerta(`🎉 Novo resultado! Concurso ${concursoNovo} foi carregado automaticamente da Caixa e os campos foram atualizados!`, 'success');
                 
                 // Adicionar efeito visual no botão de atualizar
                 const btnAtualizar = document.getElementById('atualizarResultado');
@@ -815,6 +821,9 @@ class LotofacilEstrategica {
                 document.getElementById('dataConcurso').value = this.converterDataParaInput(data.dataApuracao);
                 document.getElementById('dezenasUltimoResultado').value = data.listaDezenas.map(n => n.toString().padStart(2, '0')).join(',');
                 
+                // Adicionar feedback visual de que os dados foram preenchidos automaticamente
+                this.addVisualFeedbackToFields();
+                
                 // Salvar no localStorage para recuperação
                 localStorage.setItem('ultimo_resultado_automatico', JSON.stringify(this.ultimoResultado));
                 localStorage.setItem('ultimo_resultado_automatico_time', Date.now().toString());
@@ -823,7 +832,7 @@ class LotofacilEstrategica {
                 this.atualizarResultadosHistorico(false); // Atualizar sem mostrar alerta
                 
                 console.log('🎉 Último resultado atualizado com sucesso!');
-                this.mostrarAlerta(`✅ Concurso ${data.numero} atualizado automaticamente!`, 'success');
+                this.mostrarAlerta(`✅ Concurso ${data.numero} carregado automaticamente da Caixa! Os campos "Concurso" e "Dezenas Sorteadas" foram preenchidos.`, 'success');
                 
                 return; // Sucesso, sair do loop
                 
@@ -865,7 +874,7 @@ class LotofacilEstrategica {
             console.warn('Erro ao acessar cache do último resultado:', cacheError.message);
         }
         
-        this.mostrarAlerta('Não foi possível buscar o último resultado automaticamente. Insira manualmente ou verifique sua conexão.', 'warning');
+        this.mostrarAlerta('❌ Não foi possível buscar o último resultado da Caixa automaticamente. Por favor, insira o número do concurso e as dezenas sorteadas manualmente nos campos acima, ou tente novamente mais tarde clicando no botão "Atualizar".', 'warning');
     }
     
     validarDadosAPI(data) {
@@ -927,6 +936,30 @@ class LotofacilEstrategica {
         } catch (error) {
             console.warn('Erro na validação dos dados da API:', error.message);
             return false;
+        }
+    }
+    
+    /**
+     * Adiciona feedback visual nos campos de concurso e dezenas sorteadas.
+     * 
+     * Aplica um anel verde (ring-2 ring-green-400) aos campos "Concurso" e 
+     * "Dezenas Sorteadas" para indicar visualmente que foram preenchidos 
+     * automaticamente pela API da Caixa. O efeito visual dura 3 segundos.
+     * 
+     * @returns {void}
+     */
+    addVisualFeedbackToFields() {
+        const concursoField = document.getElementById('concurso');
+        const dezenasField = document.getElementById('dezenasUltimoResultado');
+        
+        if (concursoField && dezenasField) {
+            concursoField.classList.add('ring-2', 'ring-green-400');
+            dezenasField.classList.add('ring-2', 'ring-green-400');
+            
+            setTimeout(() => {
+                concursoField.classList.remove('ring-2', 'ring-green-400');
+                dezenasField.classList.remove('ring-2', 'ring-green-400');
+            }, 3000);
         }
     }
     
