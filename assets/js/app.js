@@ -939,7 +939,15 @@ class LotofacilEstrategica {
         }
     }
     
-    // Helper para adicionar feedback visual nos campos auto-preenchidos
+    /**
+     * Adiciona feedback visual nos campos de concurso e dezenas sorteadas.
+     * 
+     * Aplica um anel verde (ring-2 ring-green-400) aos campos "Concurso" e 
+     * "Dezenas Sorteadas" para indicar visualmente que foram preenchidos 
+     * automaticamente pela API da Caixa. O efeito visual dura 3 segundos.
+     * 
+     * @returns {void}
+     */
     addVisualFeedbackToFields() {
         const concursoField = document.getElementById('concurso');
         const dezenasField = document.getElementById('dezenasUltimoResultado');
