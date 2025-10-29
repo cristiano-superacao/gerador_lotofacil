@@ -192,14 +192,7 @@ class LotofacilEstrategica {
             document.getElementById('dezenasUltimoResultado').value = data.listaDezenas.map(n => n.toString().padStart(2, '0')).join(',');
             
             // Adicionar feedback visual de que os dados foram preenchidos automaticamente
-            const concursoField = document.getElementById('concurso');
-            const dezenasField = document.getElementById('dezenasUltimoResultado');
-            concursoField.classList.add('ring-2', 'ring-green-400');
-            dezenasField.classList.add('ring-2', 'ring-green-400');
-            setTimeout(() => {
-                concursoField.classList.remove('ring-2', 'ring-green-400');
-                dezenasField.classList.remove('ring-2', 'ring-green-400');
-            }, 3000);
+            this.addVisualFeedbackToFields();
             
             // Salvar no localStorage
             localStorage.setItem('ultimo_resultado_automatico', JSON.stringify(this.ultimoResultado));
@@ -829,14 +822,7 @@ class LotofacilEstrategica {
                 document.getElementById('dezenasUltimoResultado').value = data.listaDezenas.map(n => n.toString().padStart(2, '0')).join(',');
                 
                 // Adicionar feedback visual de que os dados foram preenchidos automaticamente
-                const concursoField = document.getElementById('concurso');
-                const dezenasField = document.getElementById('dezenasUltimoResultado');
-                concursoField.classList.add('ring-2', 'ring-green-400');
-                dezenasField.classList.add('ring-2', 'ring-green-400');
-                setTimeout(() => {
-                    concursoField.classList.remove('ring-2', 'ring-green-400');
-                    dezenasField.classList.remove('ring-2', 'ring-green-400');
-                }, 3000);
+                this.addVisualFeedbackToFields();
                 
                 // Salvar no localStorage para recuperação
                 localStorage.setItem('ultimo_resultado_automatico', JSON.stringify(this.ultimoResultado));
@@ -950,6 +936,22 @@ class LotofacilEstrategica {
         } catch (error) {
             console.warn('Erro na validação dos dados da API:', error.message);
             return false;
+        }
+    }
+    
+    // Helper para adicionar feedback visual nos campos auto-preenchidos
+    addVisualFeedbackToFields() {
+        const concursoField = document.getElementById('concurso');
+        const dezenasField = document.getElementById('dezenasUltimoResultado');
+        
+        if (concursoField && dezenasField) {
+            concursoField.classList.add('ring-2', 'ring-green-400');
+            dezenasField.classList.add('ring-2', 'ring-green-400');
+            
+            setTimeout(() => {
+                concursoField.classList.remove('ring-2', 'ring-green-400');
+                dezenasField.classList.remove('ring-2', 'ring-green-400');
+            }, 3000);
         }
     }
     
